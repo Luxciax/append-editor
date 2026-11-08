@@ -541,3 +541,22 @@
 .append-rich-editor blockquote > p:first-child:first-letter {
   color: var(--sn-stylekit-info-color);
 }
+
+
+@media screen and (max-width: 650px) {
+  .slash-command-menu {
+    left: 12px !important;
+    right: 12px !important;
+    width: auto;
+    max-height: 45vh;
+  }
+
+  .find-replace-count {
+    min-width: 46px;
+  }
+
+  .find-replace-button.text {
+    min-width: 56px;
+    padding: 0 6px;
+  }
+}
