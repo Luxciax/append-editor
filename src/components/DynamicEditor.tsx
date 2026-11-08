@@ -1,6 +1,7 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import debounce from 'lodash/debounce';
 import { EditorContent, useEditor } from '@tiptap/react';
+import { BubbleMenu, FloatingMenu } from '@tiptap/react/menus';
 import StarterKit from '@tiptap/starter-kit';
 import { Markdown } from '@tiptap/markdown';
 import { Placeholder } from '@tiptap/extensions';
@@ -332,6 +333,116 @@ export default function DynamicEditor({
 
   return (
     <div className="DynamicEditor">
+      {!sourceMode && !readOnly && (
+        <>
+          <BubbleMenu
+            editor={editor}
+            options={{ placement: 'top', offset: 8 }}
+            shouldShow={({ from, to }) => from !== to}
+          >
+            <div className="rich-context-menu selection-menu">
+              <ToolbarButton
+                title="Bold"
+                active={editor.isActive('bold')}
+                onClick={() => editor.chain().focus().toggleBold().run()}
+              >
+                <strong>B</strong>
+              </ToolbarButton>
+              <ToolbarButton
+                title="Italic"
+                active={editor.isActive('italic')}
+                onClick={() => editor.chain().focus().toggleItalic().run()}
+              >
+                <em>I</em>
+              </ToolbarButton>
+              <ToolbarButton
+                title="Underline"
+                active={editor.isActive('underline')}
+                onClick={() => editor.chain().focus().toggleUnderline().run()}
+              >
+                <u>U</u>
+              </ToolbarButton>
+              <ToolbarButton
+                title="Strikethrough"
+                active={editor.isActive('strike')}
+                onClick={() => editor.chain().focus().toggleStrike().run()}
+              >
+                <s>S</s>
+              </ToolbarButton>
+              <ToolbarButton
+                title="Highlight"
+                active={editor.isActive('highlight')}
+                onClick={() =>
+                  editor.chain().focus().toggleHighlight({ color: '#fff59d' }).run()
+                }
+              >
+                H
+              </ToolbarButton>
+              <ToolbarButton
+                title="Link"
+                active={editor.isActive('link')}
+                onClick={setLink}
+              >
+                Link
+              </ToolbarButton>
+            </div>
+          </BubbleMenu>
+
+          <FloatingMenu editor={editor} options={{ placement: 'left-start', offset: 8 }}>
+            <div className="rich-context-menu insert-menu">
+              <span className="insert-menu-label" title="Insert block">
+                +
+              </span>
+              <ToolbarButton
+                title="Heading 1"
+                onClick={() => editor.chain().focus().setHeading({ level: 1 }).run()}
+              >
+                H1
+              </ToolbarButton>
+              <ToolbarButton
+                title="Bullet list"
+                onClick={() => editor.chain().focus().toggleBulletList().run()}
+              >
+                •
+              </ToolbarButton>
+              <ToolbarButton
+                title="Task list"
+                onClick={() => editor.chain().focus().toggleTaskList().run()}
+              >
+                ☑
+              </ToolbarButton>
+              <ToolbarButton
+                title="Quote"
+                onClick={() => editor.chain().focus().toggleBlockquote().run()}
+              >
+                “
+              </ToolbarButton>
+              <ToolbarButton
+                title="Code block"
+                onClick={() => editor.chain().focus().toggleCodeBlock().run()}
+              >
+                {'</>'}
+              </ToolbarButton>
+              <ToolbarButton title="Image" onClick={insertImage}>
+                Img
+              </ToolbarButton>
+              <ToolbarButton
+                title="Table"
+                onClick={() =>
+                  editor
+                    .chain()
+                    .focus()
+                    .insertTable({ rows: 3, cols: 3, withHeaderRow: true })
+                    .run()
+                }
+              >
+                Tbl
+              </ToolbarButton>
+            </div>
+          </FloatingMenu>
+        </>
+      )}
+
       <div className="rich-toolbar" role="toolbar" aria-label="Formatting toolbar">
         <div className="rich-toolbar-group">
           <select
