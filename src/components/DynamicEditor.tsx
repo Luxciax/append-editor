@@ -312,6 +312,9 @@ export default function DynamicEditor({
   const [wholeWord, setWholeWord] = useState(false);
   const [useRegex, setUseRegex] = useState(false);
   const searchInputRef = useRef<HTMLInputElement | null>(null);
+  const runSlashCommandRef = useRef<(command: SlashCommandDefinition) => void>(
+    () => {}
+  );
 
   const emitChange = useMemo(
     () =>
@@ -549,6 +552,49 @@ export default function DynamicEditor({
     }
   }, [editor, findOpen]);
 
+  useEffect(() => {
+    if (!editor || !slashMenu.open) return;
+
+    const handleSlashKeys = (event: KeyboardEvent) => {
+      const commands = SLASH_COMMANDS.filter((command) => {
+        if (!slashMenu.query) return true;
+        const haystack = `${command.label} ${command.description} ${command.keywords}`.toLowerCase();
+        return haystack.includes(slashMenu.query);
+      });
+
+      if (!commands.length) return;
+
+      if (event.key === 'ArrowDown') {
+        event.preventDefault();
+        setSlashMenu((previous) => ({
+          ...previous,
+          selected: (previous.selected + 1) % commands.length,
+        }));
+      } else if (event.key === 'ArrowUp') {
+        event.preventDefault();
+        setSlashMenu((previous) => ({
+          ...previous,
+          selected:
+            (previous.selected - 1 + commands.length) % commands.length,
+        }));
+      } else if (event.key === 'Enter') {
+        event.preventDefault();
+        const selected =
+          commands[Math.min(slashMenu.selected, commands.length - 1)];
+        if (selected) {
+          runSlashCommandRef.current(selected);
+        }
+      } else if (event.key === 'Escape') {
+        event.preventDefault();
+        setSlashMenu(CLOSED_SLASH_MENU);
+      }
+    };
+
+    editor.view.dom.addEventListener('keydown', handleSlashKeys);
+    return () =>
+      editor.view.dom.removeEventListener('keydown', handleSlashKeys);
+  }, [editor, slashMenu]);
+
   if (!editor) {
     return <div className="DynamicEditor rich-editor-loading">Loading editor…</div>;
   }
@@ -712,44 +758,7 @@ export default function DynamicEditor({
     setSlashMenu(CLOSED_SLASH_MENU);
   };
 
-  useEffect(() => {
-    if (!editor || !slashMenu.open) return;
-
-    const handleSlashKeys = (event: KeyboardEvent) => {
-      const commands = SLASH_COMMANDS.filter((command) => {
-        if (!slashMenu.query) return true;
-        const haystack = `${command.label} ${command.description} ${command.keywords}`.toLowerCase();
-        return haystack.includes(slashMenu.query);
-      });
-
-      if (!commands.length) return;
-
-      if (event.key === 'ArrowDown') {
-        event.preventDefault();
-        setSlashMenu((previous) => ({
-          ...previous,
-          selected: (previous.selected + 1) % commands.length,
-        }));
-      } else if (event.key === 'ArrowUp') {
-        event.preventDefault();
-        setSlashMenu((previous) => ({
-          ...previous,
-          selected:
-            (previous.selected - 1 + commands.length) % commands.length,
-        }));
-      } else if (event.key === 'Enter') {
-        event.preventDefault();
-        const selected = commands[Math.min(slashMenu.selected, commands.length - 1)];
-        if (selected) runSlashCommand(selected);
-      } else if (event.key === 'Escape') {
-        event.preventDefault();
-        setSlashMenu(CLOSED_SLASH_MENU);
-      }
-    };
-
-    editor.view.dom.addEventListener('keydown', handleSlashKeys);
-    return () => editor.view.dom.removeEventListener('keydown', handleSlashKeys);
-  }, [editor, slashMenu]);
+  runSlashCommandRef.current = runSlashCommand;
 
   const updateSearchTerm = (value: string) => {
     setSearchTermState(value);
