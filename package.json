@@ -98,7 +98,8 @@
     "@tiptap/starter-kit": "3.33.0",
     "sass": "^1.80.0",
     "@tiptap/core": "3.33.0",
-    "@tiptap/extensions": "3.33.0"
+    "@tiptap/extensions": "3.33.0",
+    "@floating-ui/dom": "^1.6.0"
   },
   "eslintConfig": {
     "extends": [
