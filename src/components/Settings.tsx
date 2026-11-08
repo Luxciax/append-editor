@@ -282,7 +282,7 @@ export default class Settings extends React.Component<
 
   clearEditingMode = () => {
     this.setState({
-      editingMode: EditingModes.usePlainText,
+      editingMode: EditingModes.useDynamicEditor,
     });
   };
 
@@ -526,9 +526,9 @@ export default class Settings extends React.Component<
                   }
                   onChange={this.handleInputChange}
                 />
-                Dynamic: live formatting for Markdown. <b>warning: </b>
-                existing Markdown may break (not compatible with KaTeX, lists
-                may not render properly; desktop and mobile compatible)
+                Rich Markdown: live WYSIWYG editing with a full formatting
+                toolbar. Notes remain Markdown and can be switched to raw source
+                inside the editor. Desktop and mobile compatible.
               </label>
             </section>
             <section className="sk-panel-row settings">
