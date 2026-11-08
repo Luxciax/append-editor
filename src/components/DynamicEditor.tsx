@@ -10,7 +10,7 @@ import { EditorContent, useEditor } from '@tiptap/react';
 import { BubbleMenu, FloatingMenu } from '@tiptap/react/menus';
 import StarterKit from '@tiptap/starter-kit';
 import { Markdown } from '@tiptap/markdown';
-import { Placeholder } from '@tiptap/extensions';
+import { CharacterCount, Placeholder } from '@tiptap/extensions';
 import Highlight from '@tiptap/extension-highlight';
 import Image from '@tiptap/extension-image';
 import { TaskItem, TaskList } from '@tiptap/extension-list';
@@ -21,8 +21,12 @@ import Subscript from '@tiptap/extension-subscript';
 import Superscript from '@tiptap/extension-superscript';
 import { FindAndReplace } from '@tiptap/extension-find-and-replace';
 import Mathematics from '@tiptap/extension-mathematics';
+import CodeBlockLowlight from '@tiptap/extension-code-block-lowlight';
+import { common, createLowlight } from 'lowlight';
 import Callout, { CalloutType } from '../extensions/Callout';
 import 'katex/dist/katex.min.css';
+
+const lowlight = createLowlight(common);
 
 interface DynamicProps {
   debugMode: boolean;
@@ -157,6 +161,24 @@ const SLASH_COMMANDS: SlashCommandDefinition[] = [
     description: 'Horizontal rule',
     keywords: 'divider separator horizontal rule',
   },
+  {
+    id: 'date',
+    label: 'Current date',
+    description: 'Insert the local date',
+    keywords: 'date today calendar',
+  },
+  {
+    id: 'time',
+    label: 'Current time',
+    description: 'Insert the local time',
+    keywords: 'time clock now',
+  },
+  {
+    id: 'date-time',
+    label: 'Date and time',
+    description: 'Insert local date and time',
+    keywords: 'date time timestamp now',
+  },
 ];
 
 const ToolbarButton = ({
@@ -218,6 +240,10 @@ const hasRichOnlyFormatting = (node: any): boolean => {
     typeof node.attrs.textAlign === 'string' &&
     node.attrs.textAlign !== 'left'
   ) {
+    return true;
+  }
+
+  if (node.attrs && typeof node.attrs.dir === 'string' && node.attrs.dir) {
     return true;
   }
 
@@ -337,13 +363,18 @@ export default function DynamicEditor({
   const editor = useEditor({
     extensions: [
       StarterKit.configure({
+        codeBlock: false,
         link: {
           openOnClick: false,
           autolink: true,
           linkOnPaste: true,
         },
       }),
+      CodeBlockLowlight.configure({
+        lowlight,
+      }),
       Markdown,
+      CharacterCount,
       Placeholder.configure({
         placeholder: "Type '/' for commands, or start writing Markdown…",
       }),
@@ -387,6 +418,7 @@ export default function DynamicEditor({
     ],
     content: text || '',
     contentType: isRichHtmlDocument(text || '') ? 'html' : 'markdown',
+    textDirection: 'auto',
     editable: !readOnly,
     editorProps: {
       attributes: {
@@ -662,6 +694,19 @@ export default function DynamicEditor({
     editor.chain().focus().insertBlockMath({ latex: latex.trim() }).run();
   };
 
+  const insertDateTime = (kind: 'date' | 'time' | 'date-time') => {
+    const now = new Date();
+    const date = now.toLocaleDateString();
+    const time = now.toLocaleTimeString([], {
+      hour: '2-digit',
+      minute: '2-digit',
+    });
+    const value =
+      kind === 'date' ? date : kind === 'time' ? time : `${date} ${time}`;
+
+    editor.chain().focus().insertContent(value).run();
+  };
+
   const insertCallout = (type: CalloutType = 'info') => {
     if (editor.isActive('callout')) {
       editor.chain().focus().setCalloutType(type).run();
@@ -676,11 +721,23 @@ export default function DynamicEditor({
   );
 
   const inTable = editor.isActive('table');
+  const inCodeBlock = editor.isActive('codeBlock');
+  const activeCodeLanguage = editor.getAttributes('codeBlock').language || '';
+  const activeTextStyle = editor.getAttributes('textStyle');
+  const activeFontFamily = activeTextStyle.fontFamily || '';
+  const activeLineHeight = activeTextStyle.lineHeight || '';
+  const activeDirection =
+    editor.getAttributes('paragraph').dir ||
+    editor.getAttributes('heading').dir ||
+    '';
   const inCallout = editor.isActive('callout');
   const activeCalloutType = inCallout
     ? ((editor.getAttributes('callout').type || 'info') as CalloutType)
     : 'info';
   const richStorage = hasRichOnlyFormatting(editor.getJSON());
+  const characterStorage = (editor.storage as any).characterCount;
+  const characterCount = characterStorage?.characters?.() ?? 0;
+  const wordCount = characterStorage?.words?.() ?? 0;
   const findStorage = (editor.storage as any).findAndReplace || {
     results: [],
     currentIndex: null,
@@ -754,6 +811,18 @@ export default function DynamicEditor({
         break;
       case 'divider':
         chain.setHorizontalRule().run();
+        break;
+      case 'date':
+        chain.run();
+        window.setTimeout(() => insertDateTime('date'), 0);
+        break;
+      case 'time':
+        chain.run();
+        window.setTimeout(() => insertDateTime('time'), 0);
+        break;
+      case 'date-time':
+        chain.run();
+        window.setTimeout(() => insertDateTime('date-time'), 0);
         break;
       default:
         chain.run();
@@ -941,6 +1010,31 @@ export default function DynamicEditor({
           </select>
 
           <select
+            className="rich-toolbar-select"
+            aria-label="Font family"
+            title="Font family"
+            disabled={sourceMode || readOnly}
+            value={activeFontFamily}
+            onChange={(event) => {
+              const value = event.target.value;
+              if (!value) {
+                editor.chain().focus().unsetFontFamily().run();
+              } else {
+                editor.chain().focus().setFontFamily(value).run();
+              }
+            }}
+          >
+            <option value="">Font</option>
+            <option value="Arial">Arial</option>
+            <option value="Georgia">Georgia</option>
+            <option value="'Times New Roman'">Times New Roman</option>
+            <option value="Verdana">Verdana</option>
+            <option value="Tahoma">Tahoma</option>
+            <option value="'Courier New'">Courier New</option>
+            <option value="monospace">Monospace</option>
+          </select>
+
+          <select
             className="rich-toolbar-select compact"
             aria-label="Font size"
             title="Font size"
@@ -963,6 +1057,29 @@ export default function DynamicEditor({
             <option value="20px">20</option>
             <option value="24px">24</option>
             <option value="32px">32</option>
+          </select>
+
+          <select
+            className="rich-toolbar-select compact"
+            aria-label="Line height"
+            title="Line height"
+            disabled={sourceMode || readOnly}
+            value={activeLineHeight}
+            onChange={(event) => {
+              const value = event.target.value;
+              if (!value) {
+                editor.chain().focus().unsetLineHeight().run();
+              } else {
+                editor.chain().focus().setLineHeight(value).run();
+              }
+            }}
+          >
+            <option value="">Line</option>
+            <option value="1">1.0</option>
+            <option value="1.25">1.25</option>
+            <option value="1.5">1.5</option>
+            <option value="1.75">1.75</option>
+            <option value="2">2.0</option>
           </select>
         </div>
 
@@ -1173,6 +1290,30 @@ export default function DynamicEditor({
                 : '≡'}
             </ToolbarButton>
           ))}
+          <select
+            className="rich-toolbar-select compact"
+            aria-label="Text direction"
+            title="Text direction"
+            disabled={sourceMode || readOnly}
+            value={activeDirection}
+            onChange={(event) => {
+              const value = event.target.value;
+              if (!value) {
+                editor.chain().focus().unsetTextDirection().run();
+              } else {
+                editor
+                  .chain()
+                  .focus()
+                  .setTextDirection(value as 'ltr' | 'rtl' | 'auto')
+                  .run();
+              }
+            }}
+          >
+            <option value="">Dir</option>
+            <option value="auto">Auto</option>
+            <option value="ltr">LTR</option>
+            <option value="rtl">RTL</option>
+          </select>
         </div>
 
         <div className="rich-toolbar-group">
@@ -1219,6 +1360,39 @@ export default function DynamicEditor({
             Table
           </ToolbarButton>
         </div>
+
+        {inCodeBlock && !sourceMode && (
+          <div className="rich-toolbar-group code-tools">
+            <select
+              className="rich-toolbar-select"
+              aria-label="Code language"
+              title="Code language"
+              value={activeCodeLanguage}
+              disabled={readOnly}
+              onChange={(event) =>
+                editor
+                  .chain()
+                  .focus()
+                  .updateAttributes('codeBlock', {
+                    language: event.target.value || null,
+                  })
+                  .run()
+              }
+            >
+              <option value="">Plain code</option>
+              <option value="bash">Bash</option>
+              <option value="css">CSS</option>
+              <option value="html">HTML</option>
+              <option value="java">Java</option>
+              <option value="javascript">JavaScript</option>
+              <option value="json">JSON</option>
+              <option value="python">Python</option>
+              <option value="sql">SQL</option>
+              <option value="typescript">TypeScript</option>
+              <option value="xml">XML</option>
+            </select>
+          </div>
+        )}
 
         {inTable && !sourceMode && (
           <div className="rich-toolbar-group table-tools">
@@ -1505,6 +1679,7 @@ export default function DynamicEditor({
 
       {!sourceMode && (
         <div className="rich-editor-status">
+          <span>{wordCount} words · {characterCount} characters</span>
           <span>Type / for insert commands</span>
           <span>Double-click a formula to edit LaTeX</span>
           <span>Ctrl/Cmd+F to search</span>
