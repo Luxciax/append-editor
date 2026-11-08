@@ -1,5 +1,5 @@
 import React from 'react';
-import { EditorKit, EditorKitDelegate } from 'sn-editor-kit';
+import EditorKit, { EditorKitDelegate } from '@standardnotes/editor-kit';
 import PrintDialog from './PrintDialog';
 import EditNote from './EditNote';
 import ViewNote from './ViewNote';
@@ -191,6 +191,7 @@ let keyMap = new Map();
 
 export default class AppendEditor extends React.Component<{}, AppendInterface> {
   editorKit: any;
+  currentNote: any;
   refreshEditorTimer: NodeJS.Timeout | undefined;
   saveTimer: NodeJS.Timeout | undefined;
 
@@ -220,10 +221,10 @@ export default class AppendEditor extends React.Component<{}, AppendInterface> {
     if (debugMode) {
       console.log('AppendEditor.tsx: \n - this.configureEditorKit() triggered');
     }
-    let delegate = new EditorKitDelegate({
-      /** This loads every time a different note is loaded
-       * We turn bypassDebounce to true so
-       * the editor always renders the markdown for the latest note
+    const delegate: EditorKitDelegate = {
+      /** This loads every time a different note is loaded.
+       * We turn bypassDebounce to true so the editor always renders
+       * the markdown for the latest note.
        */
       setEditorRawText: (text: string) => {
         this.setState(
@@ -246,9 +247,6 @@ export default class AppendEditor extends React.Component<{}, AppendInterface> {
                   JSON.stringify(this.state, null, ' ')
               );
             }
-            /** Clear the debounce from the previous note and componentDidMount
-             * Then call and flush the debounce so the correct markdown will render
-             * the first time after turning the bypass off */
             isLongString.cancel();
             isLongString(text);
             isLongString.flush();
@@ -257,16 +255,11 @@ export default class AppendEditor extends React.Component<{}, AppendInterface> {
               renderLongMarkdown(text);
               renderLongMarkdown.flush();
             }
-            /** This prevents metadata from loading when saving editor options or default settings */
             if (!this.state.savingEditorOptions) {
               this.loadEditorOptions();
               this.loadDefaultSettings();
               this.loadMetaData();
             }
-            /** Turn the debounce bypass off
-             * This loads every time, even when saving editor options or default settings
-             * because bypassDebounce is set to true every time
-             */
             setTimeout(() => {
               this.setState({
                 bypassDebounce: false,
@@ -276,13 +269,20 @@ export default class AppendEditor extends React.Component<{}, AppendInterface> {
         );
       },
       clearUndoHistory: () => {},
-      getElementsBySelector: () => [],
-    });
+      onNoteValueChange: async (note: any) => {
+        this.currentNote = note;
+      },
+      handleRequestForContentHeight: () =>
+        Math.max(
+          document.body?.scrollHeight || 0,
+          document.documentElement?.scrollHeight || 0
+        ),
+    };
 
-    this.editorKit = new EditorKit({
-      delegate: delegate,
+    this.editorKit = new EditorKit(delegate, {
       mode: 'plaintext',
-      supportsFilesafe: false,
+      coallesedSaving: true,
+      coallesedSavingDelay: 150,
     });
   };
 
@@ -320,10 +320,10 @@ export default class AppendEditor extends React.Component<{}, AppendInterface> {
 
   loadDefaultSettings = () => {
     try {
-      const defaultSettingsString = this.editorKit.internal.componentRelay.getComponentDataValueForKey(
+      const defaultSettingsString = this.editorKit.getComponentDataValueForKey(
         'defaultSettings'
       );
-      const defaultEditingMode = this.editorKit.internal.componentRelay.getComponentDataValueForKey(
+      const defaultEditingMode = this.editorKit.getComponentDataValueForKey(
         'editingMode'
       );
       if (debugMode) {
@@ -379,19 +379,19 @@ export default class AppendEditor extends React.Component<{}, AppendInterface> {
         /** This else if loads legacy default settings introduced in v1.1.0
          * We only need to check defaultEditingMode because it is never empty if it is defined
          * */
-        const defaultCustomStyles = this.editorKit.internal.componentRelay.getComponentDataValueForKey(
+        const defaultCustomStyles = this.editorKit.getComponentDataValueForKey(
           'customStyles'
         );
-        const defaultFontEdit = this.editorKit.internal.componentRelay.getComponentDataValueForKey(
+        const defaultFontEdit = this.editorKit.getComponentDataValueForKey(
           'fontEdit'
         );
-        const defaultFontSize = this.editorKit.internal.componentRelay.getComponentDataValueForKey(
+        const defaultFontSize = this.editorKit.getComponentDataValueForKey(
           'fontSize'
         );
-        const defaultFontView = this.editorKit.internal.componentRelay.getComponentDataValueForKey(
+        const defaultFontView = this.editorKit.getComponentDataValueForKey(
           'fontView'
         );
-        const defaultMonacoEditorLanguage = this.editorKit.internal.componentRelay.getComponentDataValueForKey(
+        const defaultMonacoEditorLanguage = this.editorKit.getComponentDataValueForKey(
           'monacoEditorLanguage'
         );
         if (debugMode) {
@@ -455,7 +455,7 @@ export default class AppendEditor extends React.Component<{}, AppendInterface> {
 
   loadEditorOptions = () => {
     try {
-      const menuOptionsString = this.editorKit.internal.componentRelay.getComponentDataValueForKey(
+      const menuOptionsString = this.editorKit.getComponentDataValueForKey(
         'menuOptions'
       );
       if (menuOptionsString !== undefined) {
@@ -488,7 +488,10 @@ export default class AppendEditor extends React.Component<{}, AppendInterface> {
 
   // This loads the Settings and Append Text
   loadMetaData = () => {
-    this.editorKit.internal.componentRelay.streamContextItem((note: any) => {
+    const note = this.currentNote;
+    if (!note || !note.content) {
+      return;
+    }
       // Load editor settings
       if (
         note.content.appendEditorCustomStyles ||
@@ -571,10 +574,9 @@ export default class AppendEditor extends React.Component<{}, AppendInterface> {
             '\n  - loaded append new paragraph: ' +
             this.state.appendNewParagraph +
             '\n  - loaded editorKit internal appendText: ' +
-            this.editorKit.internal.note.content.appendText
+            this.currentNote.content.appendText
         );
       }
-    });
   };
 
   saveText = (text: string) => {
@@ -662,13 +664,13 @@ export default class AppendEditor extends React.Component<{}, AppendInterface> {
           appendText: '',
         },
         () => {
-          let note = this.editorKit.internal.note;
+          let note = this.currentNote;
           if (note) {
-            this.editorKit.internal.componentRelay.saveItemWithPresave(
+            this.editorKit.saveItemWithPresave(
               note,
               () => {
-                note.content.text = this.state.text; // this.editorKit.internal.note.content.text
-                note.content.appendText = this.state.appendText; // this.editorKit.internal.note.content.appendText
+                note.content.text = this.state.text; // this.currentNote.content.text
+                note.content.appendText = this.state.appendText; // this.currentNote.content.appendText
               }
             );
           }
@@ -706,9 +708,9 @@ export default class AppendEditor extends React.Component<{}, AppendInterface> {
     });
     // This will work in an SN context, but breaks the standalone editor, so we need to catch the error
     try {
-      let note = this.editorKit.internal.note;
+      let note = this.currentNote;
       if (note) {
-        this.editorKit.internal.componentRelay.saveItemWithPresave(note, () => {
+        this.editorKit.saveItemWithPresave(note, () => {
           note.content.appendText = text;
         });
       }
@@ -727,9 +729,9 @@ export default class AppendEditor extends React.Component<{}, AppendInterface> {
     });
     // This will work in an SN context, but breaks the standalone editor, so we need to catch the error
     try {
-      let note = this.editorKit.internal.note;
+      let note = this.currentNote;
       if (note) {
-        this.editorKit.internal.componentRelay.saveItemWithPresave(note, () => {
+        this.editorKit.saveItemWithPresave(note, () => {
           note.content.appendNewLine = newLine;
           note.content.appendNewParagraph = newParagraph;
         });
@@ -1197,7 +1199,7 @@ export default class AppendEditor extends React.Component<{}, AppendInterface> {
       },
       () => {
         try {
-          this.editorKit.internal.componentRelay.setComponentDataValueForKey(
+          this.editorKit.setComponentDataValueForKey(
             optionKey,
             optionValue
           );
@@ -1347,14 +1349,14 @@ export default class AppendEditor extends React.Component<{}, AppendInterface> {
         }
       }
     );
-    let note = this.editorKit.internal.note;
+    let note = this.currentNote;
     if (note) {
       if (debugMode) {
         console.log(
-          'AppendEditor.tsx: \n - onSaveSettings() this.editorKit.internal.componentRelay.saveItemWithPresave() triggered'
+          'AppendEditor.tsx: \n - onSaveSettings() this.editorKit.saveItemWithPresave() triggered'
         );
       }
-      this.editorKit.internal.componentRelay.saveItemWithPresave(note, () => {
+      this.editorKit.saveItemWithPresave(note, () => {
         note.content.appendEditorCustomStyles = customStyles;
         note.content.appendEditorEditingMode = editingMode;
         note.content.appendEditorFontEdit = fontEdit;
@@ -1364,7 +1366,7 @@ export default class AppendEditor extends React.Component<{}, AppendInterface> {
       });
       if (debugMode) {
         console.log(
-          'AppendEditor.tsx: \n - onSaveSettings() this.editorKit.internal.componentRelay.saveItemWithPresave() completed'
+          'AppendEditor.tsx: \n - onSaveSettings() this.editorKit.saveItemWithPresave() completed'
         );
       }
     }
