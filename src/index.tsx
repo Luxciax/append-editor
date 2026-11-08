@@ -1,16 +1,23 @@
 import React from 'react';
-import ReactDOM from 'react-dom';
+import { createRoot } from 'react-dom/client';
 import './index.scss';
 import * as serviceWorker from './serviceWorker';
 import reportWebVitals from './reportWebVitals';
 
 import AppendEditor from './components/AppendEditor';
 import './stylesheets/main.scss';
-ReactDOM.render(
+
+const container = document.getElementById('root');
+
+if (!container) {
+  throw new Error('Unable to find the root element');
+}
+
+const root = createRoot(container);
+root.render(
   <React.StrictMode>
     <AppendEditor />
-  </React.StrictMode>,
-  document.getElementById('root')
+  </React.StrictMode>
 );
 
 // If you want your app to work offline and load faster, you can change
@@ -18,7 +25,5 @@ ReactDOM.render(
 // Learn more about service workers: https://bit.ly/CRA-PWA
 serviceWorker.unregister();
 
-// If you want to start measuring performance in your app, pass a function
-// to log results (for example: reportWebVitals(console.log))
-// or send to an analytics endpoint. Learn more: https://bit.ly/CRA-vitals
+// If you want to start measuring performance, pass a function to log results.
 reportWebVitals();
