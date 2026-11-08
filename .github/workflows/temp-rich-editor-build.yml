@@ -1,6 +1,9 @@
 name: temporary-rich-editor-build-check
 # explicit validation marker
 
+permissions:
+  contents: write
+
 on:
   push:
     branches:
