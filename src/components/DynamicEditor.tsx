@@ -1,4 +1,10 @@
-import React, { useEffect, useMemo, useState } from 'react';
+import React, {
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from 'react';
 import debounce from 'lodash/debounce';
 import { EditorContent, useEditor } from '@tiptap/react';
 import { BubbleMenu, FloatingMenu } from '@tiptap/react/menus';
@@ -13,6 +19,9 @@ import TextAlign from '@tiptap/extension-text-align';
 import { TextStyleKit } from '@tiptap/extension-text-style';
 import Subscript from '@tiptap/extension-subscript';
 import Superscript from '@tiptap/extension-superscript';
+import { FindAndReplace } from '@tiptap/extension-find-and-replace';
+import Mathematics from '@tiptap/extension-mathematics';
+import 'katex/dist/katex.min.css';
 
 interface DynamicProps {
   debugMode: boolean;
@@ -28,6 +37,126 @@ interface ToolbarButtonProps {
   children: React.ReactNode;
   onClick: () => void;
 }
+
+interface SlashMenuState {
+  open: boolean;
+  query: string;
+  from: number;
+  to: number;
+  x: number;
+  y: number;
+  selected: number;
+}
+
+interface SlashCommandDefinition {
+  id: string;
+  label: string;
+  description: string;
+  keywords: string;
+}
+
+const CLOSED_SLASH_MENU: SlashMenuState = {
+  open: false,
+  query: '',
+  from: 0,
+  to: 0,
+  x: 0,
+  y: 0,
+  selected: 0,
+};
+
+const SLASH_COMMANDS: SlashCommandDefinition[] = [
+  {
+    id: 'paragraph',
+    label: 'Paragraph',
+    description: 'Plain text paragraph',
+    keywords: 'text normal paragraph',
+  },
+  {
+    id: 'heading1',
+    label: 'Heading 1',
+    description: 'Large section heading',
+    keywords: 'h1 title heading',
+  },
+  {
+    id: 'heading2',
+    label: 'Heading 2',
+    description: 'Medium section heading',
+    keywords: 'h2 subtitle heading',
+  },
+  {
+    id: 'heading3',
+    label: 'Heading 3',
+    description: 'Small section heading',
+    keywords: 'h3 heading',
+  },
+  {
+    id: 'bullet-list',
+    label: 'Bullet list',
+    description: 'Unordered list',
+    keywords: 'bullet list unordered',
+  },
+  {
+    id: 'ordered-list',
+    label: 'Numbered list',
+    description: 'Ordered list',
+    keywords: 'ordered numbered list',
+  },
+  {
+    id: 'task-list',
+    label: 'Task list',
+    description: 'Interactive checklist',
+    keywords: 'task todo checkbox checklist',
+  },
+  {
+    id: 'callout',
+    label: 'Callout',
+    description: 'Highlighted note block',
+    keywords: 'callout note info tip warning',
+  },
+  {
+    id: 'quote',
+    label: 'Quote',
+    description: 'Block quote',
+    keywords: 'blockquote quote',
+  },
+  {
+    id: 'code-block',
+    label: 'Code block',
+    description: 'Preformatted code',
+    keywords: 'code preformatted',
+  },
+  {
+    id: 'inline-math',
+    label: 'Inline formula',
+    description: 'KaTeX formula inside text',
+    keywords: 'math latex katex equation inline',
+  },
+  {
+    id: 'block-math',
+    label: 'Formula block',
+    description: 'Centered KaTeX formula block',
+    keywords: 'math latex katex equation block',
+  },
+  {
+    id: 'table',
+    label: 'Table',
+    description: '3 x 3 table',
+    keywords: 'table grid',
+  },
+  {
+    id: 'image',
+    label: 'Image',
+    description: 'Insert image from URL',
+    keywords: 'image picture photo url',
+  },
+  {
+    id: 'divider',
+    label: 'Divider',
+    description: 'Horizontal rule',
+    keywords: 'divider separator horizontal rule',
+  },
+];
 
 const ToolbarButton = ({
   active,
@@ -110,6 +239,7 @@ const supportedHtmlTags = new Set([
   'br',
   'code',
   'del',
+  'div',
   'em',
   'h1',
   'h2',
@@ -151,6 +281,16 @@ const hasPotentiallyUnsupportedHtml = (value: string) => {
   return false;
 };
 
+const isRichHtmlDocument = (value: string) =>
+  /^\s*<(?:p|h[1-6]|ul|ol|blockquote|table|pre|div)\b/i.test(value);
+
+const setEditorContent = (editor: any, value: string, emitUpdate = false) => {
+  editor.commands.setContent(value || '', {
+    contentType: isRichHtmlDocument(value) ? 'html' : 'markdown',
+    emitUpdate,
+  });
+};
+
 export default function DynamicEditor({
   debugMode,
   onChange,
@@ -162,6 +302,16 @@ export default function DynamicEditor({
   );
   const [sourceText, setSourceText] = useState(text || '');
   const [, setRevision] = useState(0);
+  const [slashMenu, setSlashMenu] = useState<SlashMenuState>(
+    CLOSED_SLASH_MENU
+  );
+  const [findOpen, setFindOpen] = useState(false);
+  const [searchTerm, setSearchTermState] = useState('');
+  const [replaceTerm, setReplaceTermState] = useState('');
+  const [caseSensitive, setCaseSensitive] = useState(false);
+  const [wholeWord, setWholeWord] = useState(false);
+  const [useRegex, setUseRegex] = useState(false);
+  const searchInputRef = useRef<HTMLInputElement | null>(null);
 
   const emitChange = useMemo(
     () =>
@@ -214,9 +364,25 @@ export default function DynamicEditor({
       TextStyleKit,
       Subscript,
       Superscript,
+      Mathematics.configure({
+        inlineOptions: {
+          katexOptions: {
+            throwOnError: false,
+          },
+        },
+        blockOptions: {
+          katexOptions: {
+            throwOnError: false,
+          },
+        },
+      }),
+      FindAndReplace.configure({
+        injectCSS: false,
+        searchDebounceMs: 100,
+      }),
     ],
     content: text || '',
-    contentType: 'markdown',
+    contentType: isRichHtmlDocument(text || '') ? 'html' : 'markdown',
     editable: !readOnly,
     editorProps: {
       attributes: {
@@ -238,6 +404,49 @@ export default function DynamicEditor({
     },
   });
 
+  const updateSlashMenu = useCallback(() => {
+    if (!editor || sourceMode || readOnly) {
+      setSlashMenu(CLOSED_SLASH_MENU);
+      return;
+    }
+
+    const { selection } = editor.state;
+    const { $from, empty } = selection;
+
+    if (!empty || !$from.parent.isTextblock) {
+      setSlashMenu(CLOSED_SLASH_MENU);
+      return;
+    }
+
+    const prefix = $from.parent.textBetween(
+      0,
+      $from.parentOffset,
+      undefined,
+      '\ufffc'
+    );
+    const match = prefix.match(/^\/([a-z0-9 -]*)$/i);
+
+    if (!match) {
+      setSlashMenu(CLOSED_SLASH_MENU);
+      return;
+    }
+
+    const coords = editor.view.coordsAtPos($from.pos);
+    const from = $from.pos - prefix.length;
+    const query = match[1].trim().toLowerCase();
+
+    setSlashMenu((previous) => ({
+      open: true,
+      query,
+      from,
+      to: $from.pos,
+      x: Math.min(coords.left, window.innerWidth - 300),
+      y: Math.min(coords.bottom + 6, window.innerHeight - 340),
+      selected:
+        previous.open && previous.query === query ? previous.selected : 0,
+    }));
+  }, [editor, readOnly, sourceMode]);
+
   useEffect(() => {
     if (!editor) return;
     editor.setEditable(!readOnly);
@@ -248,10 +457,7 @@ export default function DynamicEditor({
 
     const currentSerialized = serializeEditorContent(editor);
     if (currentSerialized !== text) {
-      editor.commands.setContent(text || '', {
-        contentType: 'markdown',
-        emitUpdate: false,
-      });
+      setEditorContent(editor, text || '', false);
       setSourceText(text || '');
     }
   }, [editor, sourceMode, text]);
@@ -259,15 +465,89 @@ export default function DynamicEditor({
   useEffect(() => {
     if (!editor) return;
 
-    const rerender = () => setRevision((value) => value + 1);
-    editor.on('selectionUpdate', rerender);
-    editor.on('transaction', rerender);
+    const onTransaction = () => {
+      setRevision((value) => value + 1);
+      updateSlashMenu();
+    };
+
+    const onSelectionUpdate = () => {
+      setRevision((value) => value + 1);
+      updateSlashMenu();
+    };
+
+    editor.on('selectionUpdate', onSelectionUpdate);
+    editor.on('transaction', onTransaction);
 
     return () => {
-      editor.off('selectionUpdate', rerender);
-      editor.off('transaction', rerender);
+      editor.off('selectionUpdate', onSelectionUpdate);
+      editor.off('transaction', onTransaction);
     };
+  }, [editor, updateSlashMenu]);
+
+  useEffect(() => {
+    if (!editor) return;
+
+    const handleDoubleClick = (event: MouseEvent) => {
+      const target = event.target as HTMLElement | null;
+      const mathElement = target?.closest(
+        '[data-type="inline-math"], [data-type="block-math"]'
+      ) as HTMLElement | null;
+
+      if (!mathElement) return;
+
+      let pos: number;
+      try {
+        pos = editor.view.posAtDOM(mathElement, 0);
+      } catch {
+        return;
+      }
+
+      const node = editor.state.doc.nodeAt(pos);
+      if (!node || (node.type.name !== 'inlineMath' && node.type.name !== 'blockMath')) {
+        return;
+      }
+
+      const latex = window.prompt('Edit LaTeX formula', node.attrs.latex || '');
+      if (latex === null || !latex.trim()) return;
+
+      if (node.type.name === 'inlineMath') {
+        editor.commands.updateInlineMath({ latex: latex.trim(), pos });
+      } else {
+        editor.commands.updateBlockMath({ latex: latex.trim(), pos });
+      }
+    };
+
+    editor.view.dom.addEventListener('dblclick', handleDoubleClick);
+    return () => editor.view.dom.removeEventListener('dblclick', handleDoubleClick);
   }, [editor]);
+
+  useEffect(() => {
+    if (!editor || sourceMode) return;
+
+    const handleFindShortcut = (event: KeyboardEvent) => {
+      if ((event.ctrlKey || event.metaKey) && event.key.toLowerCase() === 'f') {
+        event.preventDefault();
+        setFindOpen(true);
+        window.setTimeout(() => searchInputRef.current?.focus(), 0);
+      }
+    };
+
+    window.addEventListener('keydown', handleFindShortcut);
+    return () => window.removeEventListener('keydown', handleFindShortcut);
+  }, [editor, sourceMode]);
+
+  useEffect(() => {
+    if (!editor) return;
+
+    if (findOpen) {
+      if (searchTerm) {
+        editor.commands.setSearchTerm(searchTerm);
+      }
+      window.setTimeout(() => searchInputRef.current?.focus(), 0);
+    } else {
+      editor.commands.clearSearch();
+    }
+  }, [editor, findOpen]);
 
   if (!editor) {
     return <div className="DynamicEditor rich-editor-loading">Loading editor…</div>;
@@ -284,10 +564,7 @@ export default function DynamicEditor({
         return;
       }
 
-      editor.commands.setContent(sourceText, {
-        contentType: 'markdown',
-        emitUpdate: false,
-      });
+      setEditorContent(editor, sourceText, false);
       setSourceMode(false);
       window.setTimeout(() => editor.commands.focus(), 0);
       return;
@@ -295,6 +572,8 @@ export default function DynamicEditor({
 
     setSourceText(serializeEditorContent(editor));
     setSourceMode(true);
+    setSlashMenu(CLOSED_SLASH_MENU);
+    setFindOpen(false);
   };
 
   const setLink = () => {
@@ -316,12 +595,33 @@ export default function DynamicEditor({
     if (!value) return;
 
     if (!isRemoteImageUrl(value)) {
-      window.alert('Only http/https image URLs are supported in this mode.');
+      window.alert('Only http/https image URLs are supported for now.');
       return;
     }
 
     const alt = window.prompt('Alt text (optional)') || '';
     editor.chain().focus().setImage({ src: value.trim(), alt }).run();
+  };
+
+  const insertInlineMath = () => {
+    const latex = window.prompt('Inline LaTeX formula', 'E = mc^2');
+    if (!latex?.trim()) return;
+    editor.chain().focus().insertInlineMath({ latex: latex.trim() }).run();
+  };
+
+  const insertBlockMath = () => {
+    const latex = window.prompt('Block LaTeX formula', '\\frac{a}{b}');
+    if (!latex?.trim()) return;
+    editor.chain().focus().insertBlockMath({ latex: latex.trim() }).run();
+  };
+
+  const insertCallout = () => {
+    editor
+      .chain()
+      .focus()
+      .toggleBlockquote()
+      .insertContent('💡 ')
+      .run();
   };
 
   const currentHeading = [1, 2, 3, 4, 5, 6].find((level) =>
@@ -330,6 +630,154 @@ export default function DynamicEditor({
 
   const inTable = editor.isActive('table');
   const richStorage = hasRichOnlyFormatting(editor.getJSON());
+  const findStorage = (editor.storage as any).findAndReplace || {
+    results: [],
+    currentIndex: null,
+  };
+  const resultCount = Array.isArray(findStorage.results)
+    ? findStorage.results.length
+    : 0;
+  const currentResult =
+    typeof findStorage.currentIndex === 'number'
+      ? findStorage.currentIndex + 1
+      : 0;
+
+  const filteredSlashCommands = SLASH_COMMANDS.filter((command) => {
+    if (!slashMenu.query) return true;
+    const haystack = `${command.label} ${command.description} ${command.keywords}`.toLowerCase();
+    return haystack.includes(slashMenu.query);
+  });
+
+  const runSlashCommand = (command: SlashCommandDefinition) => {
+    const { from, to } = slashMenu;
+    const chain = editor.chain().focus().deleteRange({ from, to });
+
+    switch (command.id) {
+      case 'paragraph':
+        chain.setParagraph().run();
+        break;
+      case 'heading1':
+        chain.setHeading({ level: 1 }).run();
+        break;
+      case 'heading2':
+        chain.setHeading({ level: 2 }).run();
+        break;
+      case 'heading3':
+        chain.setHeading({ level: 3 }).run();
+        break;
+      case 'bullet-list':
+        chain.toggleBulletList().run();
+        break;
+      case 'ordered-list':
+        chain.toggleOrderedList().run();
+        break;
+      case 'task-list':
+        chain.toggleTaskList().run();
+        break;
+      case 'callout':
+        chain.run();
+        window.setTimeout(insertCallout, 0);
+        break;
+      case 'quote':
+        chain.toggleBlockquote().run();
+        break;
+      case 'code-block':
+        chain.toggleCodeBlock().run();
+        break;
+      case 'inline-math':
+        chain.run();
+        window.setTimeout(insertInlineMath, 0);
+        break;
+      case 'block-math':
+        chain.run();
+        window.setTimeout(insertBlockMath, 0);
+        break;
+      case 'table':
+        chain
+          .insertTable({ rows: 3, cols: 3, withHeaderRow: true })
+          .run();
+        break;
+      case 'image':
+        chain.run();
+        window.setTimeout(insertImage, 0);
+        break;
+      case 'divider':
+        chain.setHorizontalRule().run();
+        break;
+      default:
+        chain.run();
+        break;
+    }
+
+    setSlashMenu(CLOSED_SLASH_MENU);
+  };
+
+  useEffect(() => {
+    if (!editor || !slashMenu.open) return;
+
+    const handleSlashKeys = (event: KeyboardEvent) => {
+      const commands = SLASH_COMMANDS.filter((command) => {
+        if (!slashMenu.query) return true;
+        const haystack = `${command.label} ${command.description} ${command.keywords}`.toLowerCase();
+        return haystack.includes(slashMenu.query);
+      });
+
+      if (!commands.length) return;
+
+      if (event.key === 'ArrowDown') {
+        event.preventDefault();
+        setSlashMenu((previous) => ({
+          ...previous,
+          selected: (previous.selected + 1) % commands.length,
+        }));
+      } else if (event.key === 'ArrowUp') {
+        event.preventDefault();
+        setSlashMenu((previous) => ({
+          ...previous,
+          selected:
+            (previous.selected - 1 + commands.length) % commands.length,
+        }));
+      } else if (event.key === 'Enter') {
+        event.preventDefault();
+        const selected = commands[Math.min(slashMenu.selected, commands.length - 1)];
+        if (selected) runSlashCommand(selected);
+      } else if (event.key === 'Escape') {
+        event.preventDefault();
+        setSlashMenu(CLOSED_SLASH_MENU);
+      }
+    };
+
+    editor.view.dom.addEventListener('keydown', handleSlashKeys);
+    return () => editor.view.dom.removeEventListener('keydown', handleSlashKeys);
+  }, [editor, slashMenu]);
+
+  const updateSearchTerm = (value: string) => {
+    setSearchTermState(value);
+    editor.commands.setSearchTerm(value);
+  };
+
+  const updateReplaceTerm = (value: string) => {
+    setReplaceTermState(value);
+    editor.commands.setReplaceTerm(value);
+  };
+
+  const toggleCaseSensitive = () => {
+    const next = !caseSensitive;
+    setCaseSensitive(next);
+    editor.commands.setCaseSensitive(next);
+  };
+
+  const toggleWholeWord = () => {
+    const next = !wholeWord;
+    setWholeWord(next);
+    editor.commands.setWholeWord(next);
+  };
+
+  const toggleRegex = () => {
+    const next = !useRegex;
+    setUseRegex(next);
+    editor.commands.setUseRegex(next);
+  };
 
   return (
     <div className="DynamicEditor">
@@ -338,7 +786,7 @@ export default function DynamicEditor({
           <BubbleMenu
             editor={editor}
             options={{ placement: 'top', offset: 8 }}
-            shouldShow={({ from, to }) => from !== to}
+            shouldShow={({ from, to }) => from !== to && !findOpen}
           >
             <div className="rich-context-menu selection-menu">
               <ToolbarButton
@@ -388,22 +836,26 @@ export default function DynamicEditor({
             </div>
           </BubbleMenu>
 
-          <FloatingMenu editor={editor} options={{ placement: 'left-start', offset: 8 }}>
+          <FloatingMenu
+            editor={editor}
+            options={{ placement: 'left-start', offset: 8 }}
+            shouldShow={({ editor: currentEditor }) =>
+              !slashMenu.open &&
+              !findOpen &&
+              currentEditor.state.selection.empty
+            }
+          >
             <div className="rich-context-menu insert-menu">
-              <span className="insert-menu-label" title="Insert block">
+              <span className="insert-menu-label" title="Type / for all commands">
                 +
               </span>
               <ToolbarButton
                 title="Heading 1"
-                onClick={() => editor.chain().focus().setHeading({ level: 1 }).run()}
+                onClick={() =>
+                  editor.chain().focus().setHeading({ level: 1 }).run()
+                }
               >
                 H1
-              </ToolbarButton>
-              <ToolbarButton
-                title="Bullet list"
-                onClick={() => editor.chain().focus().toggleBulletList().run()}
-              >
-                •
               </ToolbarButton>
               <ToolbarButton
                 title="Task list"
@@ -411,17 +863,11 @@ export default function DynamicEditor({
               >
                 ☑
               </ToolbarButton>
-              <ToolbarButton
-                title="Quote"
-                onClick={() => editor.chain().focus().toggleBlockquote().run()}
-              >
-                “
+              <ToolbarButton title="Formula" onClick={insertInlineMath}>
+                ∑
               </ToolbarButton>
-              <ToolbarButton
-                title="Code block"
-                onClick={() => editor.chain().focus().toggleCodeBlock().run()}
-              >
-                {'</>'}
+              <ToolbarButton title="Callout" onClick={insertCallout}>
+                💡
               </ToolbarButton>
               <ToolbarButton title="Image" onClick={insertImage}>
                 Img
@@ -456,7 +902,13 @@ export default function DynamicEditor({
               if (value === 'paragraph') {
                 editor.chain().focus().setParagraph().run();
               } else {
-                const level = Number(value.substring(1)) as 1 | 2 | 3 | 4 | 5 | 6;
+                const level = Number(value.substring(1)) as
+                  | 1
+                  | 2
+                  | 3
+                  | 4
+                  | 5
+                  | 6;
                 editor.chain().focus().toggleHeading({ level }).run();
               }
             }}
@@ -620,6 +1072,13 @@ export default function DynamicEditor({
             ☑
           </ToolbarButton>
           <ToolbarButton
+            title="Callout"
+            disabled={sourceMode || readOnly}
+            onClick={insertCallout}
+          >
+            💡
+          </ToolbarButton>
+          <ToolbarButton
             title="Blockquote"
             active={editor.isActive('blockquote')}
             disabled={sourceMode || readOnly}
@@ -651,7 +1110,9 @@ export default function DynamicEditor({
               title={`Align ${alignment}`}
               active={editor.isActive({ textAlign: alignment })}
               disabled={sourceMode || readOnly}
-              onClick={() => editor.chain().focus().setTextAlign(alignment).run()}
+              onClick={() =>
+                editor.chain().focus().setTextAlign(alignment).run()
+              }
             >
               {alignment === 'left'
                 ? '⇤'
@@ -679,6 +1140,20 @@ export default function DynamicEditor({
             onClick={insertImage}
           >
             Image
+          </ToolbarButton>
+          <ToolbarButton
+            title="Insert inline formula"
+            disabled={sourceMode || readOnly}
+            onClick={insertInlineMath}
+          >
+            ∑
+          </ToolbarButton>
+          <ToolbarButton
+            title="Insert block formula"
+            disabled={sourceMode || readOnly}
+            onClick={insertBlockMath}
+          >
+            ∫
           </ToolbarButton>
           <ToolbarButton
             title="Insert table"
@@ -726,6 +1201,27 @@ export default function DynamicEditor({
               Col−
             </ToolbarButton>
             <ToolbarButton
+              title="Toggle header row"
+              disabled={readOnly}
+              onClick={() => editor.chain().focus().toggleHeaderRow().run()}
+            >
+              Header
+            </ToolbarButton>
+            <ToolbarButton
+              title="Merge selected cells"
+              disabled={readOnly || !editor.can().mergeCells()}
+              onClick={() => editor.chain().focus().mergeCells().run()}
+            >
+              Merge
+            </ToolbarButton>
+            <ToolbarButton
+              title="Split selected cell"
+              disabled={readOnly || !editor.can().splitCell()}
+              onClick={() => editor.chain().focus().splitCell().run()}
+            >
+              Split
+            </ToolbarButton>
+            <ToolbarButton
               title="Delete table"
               disabled={readOnly}
               onClick={() => editor.chain().focus().deleteTable().run()}
@@ -740,12 +1236,20 @@ export default function DynamicEditor({
             className={`rich-storage-badge${richStorage ? ' rich' : ''}`}
             title={
               richStorage
-                ? 'This note currently needs HTML fallback to preserve rich formatting'
-                : 'This note is stored as Markdown'
+                ? 'HTML fallback is active to preserve formatting that Markdown cannot represent'
+                : 'This note is currently stored as Markdown'
             }
           >
             {richStorage ? 'Rich HTML' : 'Markdown'}
           </span>
+          <ToolbarButton
+            title="Find and replace (Ctrl/Cmd+F)"
+            active={findOpen}
+            disabled={sourceMode}
+            onClick={() => setFindOpen((value) => !value)}
+          >
+            Find
+          </ToolbarButton>
           <ToolbarButton
             title="Undo"
             disabled={
@@ -765,7 +1269,7 @@ export default function DynamicEditor({
             ↷
           </ToolbarButton>
           <ToolbarButton
-            title={sourceMode ? 'Return to rich editor' : 'Edit Markdown source'}
+            title={sourceMode ? 'Return to rich editor' : 'Edit source'}
             active={sourceMode}
             disabled={readOnly}
             onClick={toggleSourceMode}
@@ -775,10 +1279,168 @@ export default function DynamicEditor({
         </div>
       </div>
 
+      {findOpen && !sourceMode && (
+        <div className="find-replace-panel" role="search" aria-label="Find and replace">
+          <div className="find-replace-row">
+            <input
+              ref={searchInputRef}
+              className="find-replace-input"
+              type="text"
+              value={searchTerm}
+              placeholder="Find"
+              aria-label="Find"
+              onChange={(event) => updateSearchTerm(event.target.value)}
+              onKeyDown={(event) => {
+                if (event.key === 'Enter') {
+                  event.preventDefault();
+                  if (event.shiftKey) {
+                    editor.commands.goToPreviousResult();
+                  } else {
+                    editor.commands.goToNextResult();
+                  }
+                } else if (event.key === 'Escape') {
+                  setFindOpen(false);
+                }
+              }}
+            />
+            <span className="find-replace-count" aria-live="polite">
+              {currentResult} / {resultCount}
+            </span>
+            <button
+              type="button"
+              className="find-replace-button"
+              disabled={!resultCount}
+              onClick={() => editor.commands.goToPreviousResult()}
+              title="Previous result"
+            >
+              ↑
+            </button>
+            <button
+              type="button"
+              className="find-replace-button"
+              disabled={!resultCount}
+              onClick={() => editor.commands.goToNextResult()}
+              title="Next result"
+            >
+              ↓
+            </button>
+            <button
+              type="button"
+              className="find-replace-button"
+              onClick={() => setFindOpen(false)}
+              title="Close find and replace"
+            >
+              ×
+            </button>
+          </div>
+          <div className="find-replace-row">
+            <input
+              className="find-replace-input"
+              type="text"
+              value={replaceTerm}
+              placeholder="Replace with"
+              aria-label="Replace with"
+              disabled={readOnly}
+              onChange={(event) => updateReplaceTerm(event.target.value)}
+              onKeyDown={(event) => {
+                if (event.key === 'Enter' && !readOnly) {
+                  event.preventDefault();
+                  editor.commands.replace();
+                }
+              }}
+            />
+            <button
+              type="button"
+              className="find-replace-button text"
+              disabled={readOnly || !resultCount}
+              onClick={() => editor.commands.replace()}
+            >
+              Replace
+            </button>
+            <button
+              type="button"
+              className="find-replace-button text"
+              disabled={readOnly || !resultCount}
+              onClick={() => editor.commands.replaceAll()}
+            >
+              All
+            </button>
+          </div>
+          <div className="find-replace-options">
+            <label>
+              <input
+                type="checkbox"
+                checked={caseSensitive}
+                onChange={toggleCaseSensitive}
+              />
+              Match case
+            </label>
+            <label>
+              <input
+                type="checkbox"
+                checked={wholeWord}
+                disabled={useRegex}
+                onChange={toggleWholeWord}
+              />
+              Whole word
+            </label>
+            <label>
+              <input
+                type="checkbox"
+                checked={useRegex}
+                onChange={toggleRegex}
+              />
+              Regex
+            </label>
+          </div>
+        </div>
+      )}
+
+      {slashMenu.open && (
+        <div
+          className="slash-command-menu"
+          role="listbox"
+          aria-label="Insert block"
+          style={{ left: slashMenu.x, top: slashMenu.y }}
+        >
+          <div className="slash-command-header">
+            {slashMenu.query ? `Commands matching “${slashMenu.query}”` : 'Insert'}
+          </div>
+          {filteredSlashCommands.length ? (
+            filteredSlashCommands.map((command, index) => (
+              <button
+                type="button"
+                role="option"
+                aria-selected={index === slashMenu.selected}
+                className={`slash-command-item${
+                  index === slashMenu.selected ? ' selected' : ''
+                }`}
+                key={command.id}
+                onMouseDown={(event) => {
+                  event.preventDefault();
+                  runSlashCommand(command);
+                }}
+                onMouseEnter={() =>
+                  setSlashMenu((previous) => ({
+                    ...previous,
+                    selected: index,
+                  }))
+                }
+              >
+                <strong>{command.label}</strong>
+                <span>{command.description}</span>
+              </button>
+            ))
+          ) : (
+            <div className="slash-command-empty">No matching commands</div>
+          )}
+        </div>
+      )}
+
       {sourceMode ? (
         <textarea
           className="rich-source-editor"
-          aria-label="Markdown source"
+          aria-label="Note source"
           spellCheck={false}
           value={sourceText}
           onChange={(event) => {
@@ -789,6 +1451,14 @@ export default function DynamicEditor({
         />
       ) : (
         <EditorContent editor={editor} />
+      )}
+
+      {!sourceMode && (
+        <div className="rich-editor-status">
+          <span>Type / for insert commands</span>
+          <span>Double-click a formula to edit LaTeX</span>
+          <span>Ctrl/Cmd+F to search</span>
+        </div>
       )}
     </div>
   );
