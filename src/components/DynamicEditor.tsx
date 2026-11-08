@@ -368,15 +368,9 @@ export default function DynamicEditor({
       Subscript,
       Superscript,
       Mathematics.configure({
-        inlineOptions: {
-          katexOptions: {
-            throwOnError: false,
-          },
-        },
-        blockOptions: {
-          katexOptions: {
-            throwOnError: false,
-          },
+        katexOptions: {
+          throwOnError: false,
+          strict: false,
         },
       }),
       FindAndReplace.configure({
