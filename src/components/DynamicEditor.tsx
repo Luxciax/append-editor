@@ -61,13 +61,104 @@ const normalizeLink = (value: string) => {
 
 const isRemoteImageUrl = (value: string) => /^https?:\/\//i.test(value.trim());
 
+const richOnlyMarks = new Set([
+  'highlight',
+  'subscript',
+  'superscript',
+  'textStyle',
+]);
+
+const hasRichOnlyFormatting = (node: any): boolean => {
+  if (!node) return false;
+
+  if (
+    Array.isArray(node.marks) &&
+    node.marks.some((mark: any) => richOnlyMarks.has(mark.type))
+  ) {
+    return true;
+  }
+
+  if (
+    node.attrs &&
+    typeof node.attrs.textAlign === 'string' &&
+    node.attrs.textAlign !== 'left'
+  ) {
+    return true;
+  }
+
+  if (
+    node.type === 'image' &&
+    node.attrs &&
+    (node.attrs.width || node.attrs.height)
+  ) {
+    return true;
+  }
+
+  return Array.isArray(node.content)
+    ? node.content.some((child: any) => hasRichOnlyFormatting(child))
+    : false;
+};
+
+const serializeEditorContent = (editor: any) =>
+  hasRichOnlyFormatting(editor.getJSON()) ? editor.getHTML() : editor.getMarkdown();
+
+const supportedHtmlTags = new Set([
+  'a',
+  'b',
+  'blockquote',
+  'br',
+  'code',
+  'del',
+  'em',
+  'h1',
+  'h2',
+  'h3',
+  'h4',
+  'h5',
+  'h6',
+  'hr',
+  'i',
+  'img',
+  'input',
+  'li',
+  'mark',
+  'ol',
+  'p',
+  'pre',
+  's',
+  'span',
+  'strong',
+  'sub',
+  'sup',
+  'table',
+  'tbody',
+  'td',
+  'th',
+  'thead',
+  'tr',
+  'u',
+  'ul',
+]);
+
+const hasPotentiallyUnsupportedHtml = (value: string) => {
+  const tags = value.matchAll(/<\/?([a-z][a-z0-9-]*)(?:\s[^>]*)?>/gi);
+  for (const match of tags) {
+    if (!supportedHtmlTags.has(match[1].toLowerCase())) {
+      return true;
+    }
+  }
+  return false;
+};
+
 export default function DynamicEditor({
   debugMode,
   onChange,
   readOnly,
   text,
 }: DynamicProps) {
-  const [sourceMode, setSourceMode] = useState(false);
+  const [sourceMode, setSourceMode] = useState(() =>
+    hasPotentiallyUnsupportedHtml(text || '')
+  );
   const [sourceText, setSourceText] = useState(text || '');
   const [, setRevision] = useState(0);
 
@@ -133,11 +224,15 @@ export default function DynamicEditor({
       },
     },
     onUpdate: ({ editor: currentEditor }) => {
-      const markdown = currentEditor.getMarkdown();
-      setSourceText(markdown);
-      emitChange(markdown);
+      const serialized = serializeEditorContent(currentEditor);
+      setSourceText(serialized);
+      emitChange(serialized);
       if (debugMode) {
-        console.log('DynamicEditor markdown:', markdown);
+        console.log(
+          'DynamicEditor serialized content:',
+          hasRichOnlyFormatting(currentEditor.getJSON()) ? 'rich-html' : 'markdown',
+          serialized
+        );
       }
     },
   });
@@ -150,8 +245,8 @@ export default function DynamicEditor({
   useEffect(() => {
     if (!editor || sourceMode) return;
 
-    const currentMarkdown = editor.getMarkdown();
-    if (currentMarkdown !== text) {
+    const currentSerialized = serializeEditorContent(editor);
+    if (currentSerialized !== text) {
       editor.commands.setContent(text || '', {
         contentType: 'markdown',
         emitUpdate: false,
@@ -179,6 +274,15 @@ export default function DynamicEditor({
 
   const toggleSourceMode = () => {
     if (sourceMode) {
+      if (
+        hasPotentiallyUnsupportedHtml(sourceText) &&
+        !window.confirm(
+          'This note contains HTML elements the rich editor may not understand. Switching to WYSIWYG mode can normalize or remove unsupported HTML. Continue?'
+        )
+      ) {
+        return;
+      }
+
       editor.commands.setContent(sourceText, {
         contentType: 'markdown',
         emitUpdate: false,
@@ -188,7 +292,7 @@ export default function DynamicEditor({
       return;
     }
 
-    setSourceText(editor.getMarkdown());
+    setSourceText(serializeEditorContent(editor));
     setSourceMode(true);
   };
 
@@ -224,6 +328,7 @@ export default function DynamicEditor({
   );
 
   const inTable = editor.isActive('table');
+  const richStorage = hasRichOnlyFormatting(editor.getJSON());
 
   return (
     <div className="DynamicEditor">
@@ -520,6 +625,16 @@ export default function DynamicEditor({
         )}
 
         <div className="rich-toolbar-group rich-toolbar-spacer">
+          <span
+            className={`rich-storage-badge${richStorage ? ' rich' : ''}`}
+            title={
+              richStorage
+                ? 'This note currently needs HTML fallback to preserve rich formatting'
+                : 'This note is stored as Markdown'
+            }
+          >
+            {richStorage ? 'Rich HTML' : 'Markdown'}
+          </span>
           <ToolbarButton
             title="Undo"
             disabled={
