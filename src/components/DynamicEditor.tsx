@@ -21,6 +21,7 @@ import Subscript from '@tiptap/extension-subscript';
 import Superscript from '@tiptap/extension-superscript';
 import { FindAndReplace } from '@tiptap/extension-find-and-replace';
 import Mathematics from '@tiptap/extension-mathematics';
+import Callout, { CalloutType } from '../extensions/Callout';
 import 'katex/dist/katex.min.css';
 
 interface DynamicProps {
@@ -201,6 +202,10 @@ const richOnlyMarks = new Set([
 const hasRichOnlyFormatting = (node: any): boolean => {
   if (!node) return false;
 
+  if (node.type === 'callout') {
+    return true;
+  }
+
   if (
     Array.isArray(node.marks) &&
     node.marks.some((mark: any) => richOnlyMarks.has(mark.type))
@@ -234,6 +239,7 @@ const serializeEditorContent = (editor: any) =>
 
 const supportedHtmlTags = new Set([
   'a',
+  'aside',
   'b',
   'blockquote',
   'br',
@@ -282,7 +288,7 @@ const hasPotentiallyUnsupportedHtml = (value: string) => {
 };
 
 const isRichHtmlDocument = (value: string) =>
-  /^\s*<(?:p|h[1-6]|ul|ol|blockquote|table|pre|div)\b/i.test(value);
+  /^\s*<(?:p|h[1-6]|ul|ol|blockquote|table|pre|div|aside)\b/i.test(value);
 
 const setEditorContent = (editor: any, value: string, emitUpdate = false) => {
   editor.commands.setContent(value || '', {
@@ -367,6 +373,7 @@ export default function DynamicEditor({
       TextStyleKit,
       Subscript,
       Superscript,
+      Callout,
       Mathematics.configure({
         katexOptions: {
           throwOnError: false,
@@ -655,13 +662,13 @@ export default function DynamicEditor({
     editor.chain().focus().insertBlockMath({ latex: latex.trim() }).run();
   };
 
-  const insertCallout = () => {
-    editor
-      .chain()
-      .focus()
-      .toggleBlockquote()
-      .insertContent('💡 ')
-      .run();
+  const insertCallout = (type: CalloutType = 'info') => {
+    if (editor.isActive('callout')) {
+      editor.chain().focus().setCalloutType(type).run();
+      return;
+    }
+
+    editor.chain().focus().toggleCallout({ type }).run();
   };
 
   const currentHeading = [1, 2, 3, 4, 5, 6].find((level) =>
@@ -669,6 +676,10 @@ export default function DynamicEditor({
   );
 
   const inTable = editor.isActive('table');
+  const inCallout = editor.isActive('callout');
+  const activeCalloutType = inCallout
+    ? ((editor.getAttributes('callout').type || 'info') as CalloutType)
+    : 'info';
   const richStorage = hasRichOnlyFormatting(editor.getJSON());
   const findStorage = (editor.storage as any).findAndReplace || {
     results: [],
@@ -716,7 +727,7 @@ export default function DynamicEditor({
         break;
       case 'callout':
         chain.run();
-        window.setTimeout(insertCallout, 0);
+        window.setTimeout(() => insertCallout('info'), 0);
         break;
       case 'quote':
         chain.toggleBlockquote().run();
@@ -869,7 +880,11 @@ export default function DynamicEditor({
               <ToolbarButton title="Formula" onClick={insertInlineMath}>
                 ∑
               </ToolbarButton>
-              <ToolbarButton title="Callout" onClick={insertCallout}>
+              <ToolbarButton
+                title="Callout"
+                active={inCallout}
+                onClick={() => insertCallout('info')}
+              >
                 💡
               </ToolbarButton>
               <ToolbarButton title="Image" onClick={insertImage}>
@@ -1076,8 +1091,9 @@ export default function DynamicEditor({
           </ToolbarButton>
           <ToolbarButton
             title="Callout"
+            active={inCallout}
             disabled={sourceMode || readOnly}
-            onClick={insertCallout}
+            onClick={() => insertCallout('info')}
           >
             💡
           </ToolbarButton>
@@ -1105,6 +1121,37 @@ export default function DynamicEditor({
             —
           </ToolbarButton>
         </div>
+
+        {inCallout && !sourceMode && (
+          <div className="rich-toolbar-group callout-tools">
+            <select
+              className="rich-toolbar-select"
+              aria-label="Callout type"
+              title="Callout type"
+              value={activeCalloutType}
+              disabled={readOnly}
+              onChange={(event) =>
+                editor
+                  .chain()
+                  .focus()
+                  .setCalloutType(event.target.value as CalloutType)
+                  .run()
+              }
+            >
+              <option value="info">Info</option>
+              <option value="tip">Tip</option>
+              <option value="warning">Warning</option>
+              <option value="danger">Danger</option>
+            </select>
+            <ToolbarButton
+              title="Remove callout"
+              disabled={readOnly}
+              onClick={() => editor.chain().focus().unsetCallout().run()}
+            >
+              Remove
+            </ToolbarButton>
+          </div>
+        )}
 
         <div className="rich-toolbar-group">
           {(['left', 'center', 'right', 'justify'] as const).map((alignment) => (
