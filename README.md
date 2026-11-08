@@ -493,3 +493,5 @@ Early stages of this editor were based heavily on the Standard Notes [Token Vaul
 - [Append Editor To do List](https://github.com/TheodoreChu/append-editor/projects/1) for the roadmap of the Append Editor
 - [Standard Notes Slack](https://standardnotes.org/slack) for connecting with the Standard Notes Community
 - [Standard Notes Help](https://standardnotes.org/help) for help with issues related to Standard Notes but unrelated to this editor
+
+- Rich editor formatting also includes font family, font size, line height, bidirectional LTR/RTL controls, character/word counts, local date/time insertion, and language-aware highlighted code blocks.
