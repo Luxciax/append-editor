@@ -24,8 +24,8 @@
   "homepage": ".",
   "scripts": {
     "analyze": "source-map-explorer 'build/static/js/*.js'",
-    "start": "PORT=3001 react-scripts start",
-    "build": "react-scripts build",
+    "start": "PORT=3001 react-app-rewired start",
+    "build": "react-app-rewired build",
     "clean-deploy-cache": "rm -rf node_modules/.cache/gh-pages",
     "predeploy": "yarn run pretty && cp README.md public/README.txt && cp LICENSE public/LICENSE.txt && yarn run build && yarn clean-deploy-cache",
     "deploy-build": "yarn run predeploy && gh-pages -b build -d build",
@@ -102,7 +102,9 @@
     "@floating-ui/dom": "^1.6.0",
     "@tiptap/extension-find-and-replace": "3.33.0",
     "@tiptap/extension-mathematics": "3.33.0",
-    "@standardnotes/component-relay": "2.2.2"
+    "@standardnotes/component-relay": "2.2.2",
+    "path-browserify": "^1.0.1",
+    "react-app-rewired": "^2.2.1"
   },
   "eslintConfig": {
     "extends": [
