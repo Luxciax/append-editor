@@ -101,7 +101,8 @@
     "@tiptap/extensions": "3.33.0",
     "@floating-ui/dom": "^1.6.0",
     "@tiptap/extension-find-and-replace": "3.33.0",
-    "@tiptap/extension-mathematics": "3.33.0"
+    "@tiptap/extension-mathematics": "3.33.0",
+    "@standardnotes/component-relay": "2.2.2"
   },
   "eslintConfig": {
     "extends": [
@@ -133,5 +134,8 @@
     "src/**/*.{js,jsx,ts,tsx,json,css,scss,md}": [
       "prettier --write"
     ]
+  },
+  "resolutions": {
+    "@standardnotes/component-relay": "2.2.2"
   }
 }
