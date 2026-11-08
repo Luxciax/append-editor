@@ -1,69 +1,273 @@
 .DynamicEditor {
-  padding: 9px 30px 10px;
-  div[class^='sc'] {
-    background-color: var(--sn-stylekit-background-color);
-
-    // The Rich Markdown Editor sets margins to be 1em 0 0.5em
-    // This resets it to the default for each header
-    h1 {
-      margin: 0.67em 0px 0.67em;
-    }
-    h2 {
-      margin: 0.83em 0px 0.83em;
-    }
-    h3 {
-      margin: 1em 0px 1em;
-    }
-    h4 {
-      margin: 1.33em 0px 1.33em;
-    }
-    // The Rich Markdown Editor sets the font-weight for headers to be 500
-    // This is less than font weight for <strong> which is 600
-    // This reverts the font-weight back to 700
-    h1,
-    h2,
-    h3,
-    h4 {
-      .heading-content {
-        font-weight: bold;
-      }
-    }
-    .token.string {
-      color: var(--sn-stylekit-foreground-color);
-    }
-  }
-}
-
-button.block-menu-trigger {
-  display: none !important;
-}
-@media screen and (min-width: 725px) {
-  .DynamicEditor {
-    padding: 5px 20px 10px;
-  }
-}
-@media screen and (min-width: 600px) {
-  .YouTube {
-    min-height: 315px;
-    min-width: 560px;
-    margin: 10px auto;
-    display: block;
-  }
-}
-
-.ProseMirror {
-  background-color: var(--sn-stylekit-background-color);
+  display: flex;
+  flex-direction: column;
+  min-height: 100%;
+  background: var(--sn-stylekit-background-color);
   color: var(--sn-stylekit-foreground-color);
 }
 
+.rich-editor-loading {
+  padding: 16px;
+}
+
+.rich-toolbar {
+  position: sticky;
+  top: 0;
+  z-index: 30;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px;
+  padding: 7px 10px;
+  border-bottom: 1px solid var(--sn-stylekit-border-color);
+  background: var(--sn-stylekit-background-color);
+  box-shadow: 0 1px 0 rgba(0, 0, 0, 0.03);
+}
+
+.rich-toolbar-group {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  padding-right: 6px;
+  border-right: 1px solid var(--sn-stylekit-border-color);
+}
+
+.rich-toolbar-group:last-child {
+  border-right: 0;
+}
+
+.rich-toolbar-spacer {
+  margin-left: auto;
+}
+
+.rich-toolbar-button,
+.rich-toolbar-select,
+.rich-color-control {
+  min-height: 30px;
+  border: 1px solid transparent;
+  border-radius: 5px;
+  background: transparent;
+  color: var(--sn-stylekit-foreground-color);
+  font: inherit;
+  font-size: 13px;
+}
+
+.rich-toolbar-button {
+  min-width: 30px;
+  padding: 4px 7px;
+  cursor: pointer;
+}
+
+.rich-toolbar-button:hover:not(:disabled),
+.rich-toolbar-button.active {
+  border-color: var(--sn-stylekit-border-color);
+  background: var(--sn-stylekit-contrast-background-color);
+}
+
+.rich-toolbar-button.active {
+  color: var(--sn-stylekit-info-color);
+}
+
+.rich-toolbar-button:disabled,
+.rich-toolbar-select:disabled,
+.rich-color-control:has(input:disabled) {
+  cursor: default;
+  opacity: 0.45;
+}
+
+.rich-toolbar-select {
+  padding: 3px 6px;
+  max-width: 130px;
+}
+
+.rich-toolbar-select.compact {
+  max-width: 70px;
+}
+
+.rich-color-control {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 30px;
+  padding: 4px 6px;
+  cursor: pointer;
+  font-weight: 600;
+}
+
+.rich-color-control input {
+  position: absolute;
+  inset: auto 3px 2px 3px;
+  width: calc(100% - 6px);
+  height: 4px;
+  padding: 0;
+  border: 0;
+  opacity: 0.9;
+  cursor: pointer;
+}
+
+.rich-color-control.highlight {
+  background: var(--sn-stylekit-contrast-background-color);
+}
+
+.append-rich-editor {
+  min-height: 320px;
+  padding: 18px 24px 60px;
+  outline: none;
+  line-height: 1.65;
+  word-break: break-word;
+}
+
+.append-rich-editor > *:first-child {
+  margin-top: 0;
+}
+
+.append-rich-editor p.is-editor-empty:first-child::before {
+  content: attr(data-placeholder);
+  float: left;
+  height: 0;
+  color: var(--sn-stylekit-neutral-color);
+  pointer-events: none;
+}
+
+.append-rich-editor h1,
+.append-rich-editor h2,
+.append-rich-editor h3,
+.append-rich-editor h4,
+.append-rich-editor h5,
+.append-rich-editor h6 {
+  line-height: 1.25;
+}
+
+.append-rich-editor blockquote {
+  margin-left: 0;
+  padding-left: 1em;
+  border-left: 3px solid var(--sn-stylekit-border-color);
+  color: var(--sn-stylekit-contrast-foreground-color);
+}
+
+.append-rich-editor ul[data-type='taskList'] {
+  list-style: none;
+  padding-left: 0;
+}
+
+.append-rich-editor ul[data-type='taskList'] li {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+}
+
+.append-rich-editor ul[data-type='taskList'] li > label {
+  margin-top: 4px;
+}
+
+.append-rich-editor ul[data-type='taskList'] li > div {
+  flex: 1;
+}
+
+.append-rich-editor table {
+  width: 100%;
+  table-layout: fixed;
+  border-collapse: collapse;
+  margin: 1em 0;
+  overflow: hidden;
+}
+
+.append-rich-editor th,
+.append-rich-editor td {
+  position: relative;
+  min-width: 80px;
+  padding: 7px 9px;
+  vertical-align: top;
+  border: 1px solid var(--sn-stylekit-border-color);
+}
+
+.append-rich-editor th {
+  background: var(--sn-stylekit-contrast-background-color);
+  font-weight: 600;
+}
+
+.append-rich-editor .selectedCell::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: rgba(120, 120, 120, 0.12);
+  pointer-events: none;
+}
+
+.append-rich-editor img {
+  display: block;
+  max-width: 100%;
+  height: auto;
+  margin: 1em auto;
+  border-radius: 4px;
+}
+
+.append-rich-editor a {
+  color: var(--sn-stylekit-info-color);
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
+.append-rich-editor pre {
+  overflow-x: auto;
+}
+
+.rich-source-editor {
+  box-sizing: border-box;
+  width: 100%;
+  min-height: 420px;
+  flex: 1;
+  resize: none;
+  border: 0;
+  outline: 0;
+  padding: 18px 24px 60px;
+  background: var(--sn-stylekit-background-color);
+  color: var(--sn-stylekit-foreground-color);
+  font-family: var(--sn-stylekit-monospace-font);
+  font-size: var(--sn-stylekit-font-size-editor);
+  line-height: 1.55;
+  tab-size: 2;
+}
+
 #content.overflow {
-  .ProseMirror {
+  .append-rich-editor {
     overflow-wrap: normal !important;
   }
-  .ProseMirror li p:first-child {
+
+  .append-rich-editor li p:first-child {
     word-break: normal !important;
   }
-  .DynamicEditor pre {
+
+  .append-rich-editor pre {
     overflow: visible;
+  }
+}
+
+@media screen and (max-width: 650px) {
+  .rich-toolbar {
+    position: sticky;
+    gap: 4px;
+    padding: 6px;
+  }
+
+  .rich-toolbar-group {
+    padding-right: 3px;
+  }
+
+  .rich-toolbar-spacer {
+    margin-left: 0;
+  }
+
+  .append-rich-editor,
+  .rich-source-editor {
+    padding: 14px 12px 48px;
+  }
+
+  .rich-toolbar-button,
+  .rich-toolbar-select,
+  .rich-color-control {
+    min-height: 34px;
+    font-size: 14px;
   }
 }
