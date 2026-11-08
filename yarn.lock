@@ -2971,7 +2971,7 @@
   dependencies:
     "@sinonjs/commons" "^1.7.0"
 
-"@standardnotes/component-relay@2.2.2", "@standardnotes/component-relay@github:standardnotes/component-relay#839ff5db9bc92db9d42cad8d202ddc4df729597d":
+"@standardnotes/component-relay@2.2.2", "@standardnotes/component-relay@standardnotes/component-relay#839ff5db9bc92db9d42cad8d202ddc4df729597d":
   version "2.2.2"
   resolved "https://registry.yarnpkg.com/@standardnotes/component-relay/-/component-relay-2.2.2.tgz#0002738e93e4d913a4df323f9d614adc495429a6"
   integrity sha512-Gb4ASXzXGE5NJG+l2uj3Az1Ria2AJUhuqbE3aUNkOfJkV75Jso3itYYXPf5+EGXxD7+7+VnJeUCV4APgD/chbg==
