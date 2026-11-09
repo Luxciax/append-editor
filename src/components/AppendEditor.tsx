@@ -2,6 +2,7 @@ import React from 'react';
 import EditorKit, { EditorKitDelegate } from '@standardnotes/editor-kit';
 import PrintDialog from './PrintDialog';
 import EditNote from './EditNote';
+import DynamicEditor from './DynamicEditor';
 import ViewNote from './ViewNote';
 import AppendText from './AppendText';
 import Settings from './Settings';
@@ -208,7 +209,9 @@ export default class AppendEditor extends React.Component<{}, AppendInterface> {
     if (debugMode) {
       console.log('AppendEditor.tsx: \n - this.componentDidMount() triggered');
     }
-    this.onViewMode();
+    // Rich Markdown is the primary editing surface in this fork.
+    // Do not boot into the legacy split Edit/View workflow.
+    this.setState({ editMode: true, viewMode: false });
     this.loadDefaultMenuState();
     document.addEventListener('scroll', this.onScroll);
   };
@@ -354,7 +357,10 @@ export default class AppendEditor extends React.Component<{}, AppendInterface> {
         this.setState(
           {
             customStyles: defaultSettingsObject.customStyles,
-            editingMode: defaultSettingsObject.editingMode,
+            editingMode:
+              defaultSettingsObject.editingMode === EditingModes.useMonacoEditor
+                ? EditingModes.useMonacoEditor
+                : EditingModes.useDynamicEditor,
             fontEdit: defaultSettingsObject.fontEdit,
             fontSize: defaultSettingsObject.fontSize,
             fontView: defaultSettingsObject.fontView,
@@ -414,14 +420,20 @@ export default class AppendEditor extends React.Component<{}, AppendInterface> {
         this.setState(
           {
             customStyles: defaultCustomStyles,
-            editingMode: defaultEditingMode,
+            editingMode:
+              defaultEditingMode === EditingModes.useMonacoEditor
+                ? EditingModes.useMonacoEditor
+                : EditingModes.useDynamicEditor,
             fontEdit: defaultFontEdit,
             fontSize: defaultFontSize,
             fontView: defaultFontView,
             monacoEditorLanguage: defaultMonacoEditorLanguage,
             defaultSettings: {
               customStyles: defaultCustomStyles,
-              editingMode: defaultEditingMode,
+              editingMode:
+                defaultEditingMode === EditingModes.useMonacoEditor
+                  ? EditingModes.useMonacoEditor
+                  : EditingModes.useDynamicEditor,
               fontEdit: defaultFontEdit,
               fontSize: defaultFontSize,
               fontView: defaultFontView,
@@ -504,7 +516,10 @@ export default class AppendEditor extends React.Component<{}, AppendInterface> {
         this.setState(
           {
             customStyles: note.content.appendEditorCustomStyles,
-            editingMode: note.content.appendEditorEditingMode,
+            editingMode:
+              note.content.appendEditorEditingMode === EditingModes.useMonacoEditor
+                ? EditingModes.useMonacoEditor
+                : EditingModes.useDynamicEditor,
             fontEdit: note.content.appendEditorFontEdit,
             fontSize: note.content.appendEditorFontSize,
             fontView: note.content.appendEditorFontView,
@@ -1889,6 +1904,9 @@ export default class AppendEditor extends React.Component<{}, AppendInterface> {
   };
 
   render() {
+    const richMode =
+      this.state.editingMode !== EditingModes.useMonacoEditor;
+
     return [
       <span id={'top'} key={'top'}></span>,
       <div
@@ -1917,32 +1935,36 @@ export default class AppendEditor extends React.Component<{}, AppendInterface> {
             }
           >
             <div className="sk-button-group" key={'header-button-group'}>
-              <button
-                type="button"
-                id={HtmlElementId.editButton}
-                key={HtmlElementId.editButton}
-                onClick={this.onEditMode}
-                title="Toggle Edit Mode"
-                className={'sk-button ' + (this.state.editMode ? 'on' : 'off')}
-              >
-                <PencilIcon condition={this.state.editMode} role="button" />
-              </button>
-              <button
-                type="button"
-                id={HtmlElementId.viewButton}
-                key={HtmlElementId.viewButton}
-                onClick={this.onViewMode}
-                title="Toggle View Mode"
-                className={'sk-button ' + (this.state.viewMode ? 'on' : 'off')}
-              >
-                <EyeIcon condition={this.state.viewMode} role="button" />
-              </button>
+              {!richMode && (
+                <>
+                  <button
+                    type="button"
+                    id={HtmlElementId.editButton}
+                    key={HtmlElementId.editButton}
+                    onClick={this.onEditMode}
+                    title="编辑模式"
+                    className={'sk-button ' + (this.state.editMode ? 'on' : 'off')}
+                  >
+                    <PencilIcon condition={this.state.editMode} role="button" />
+                  </button>
+                  <button
+                    type="button"
+                    id={HtmlElementId.viewButton}
+                    key={HtmlElementId.viewButton}
+                    onClick={this.onViewMode}
+                    title="预览模式"
+                    className={'sk-button ' + (this.state.viewMode ? 'on' : 'off')}
+                  >
+                    <EyeIcon condition={this.state.viewMode} role="button" />
+                  </button>
+                </>
+              )}
               <button
                 type="button"
                 id={HtmlElementId.appendButton}
                 key={HtmlElementId.appendButton}
                 onClick={() => this.onAppendMode()}
-                title="Toggle Append Mode"
+                title="追加内容"
                 className={
                   'sk-button ' + (this.state.appendMode ? 'on' : 'off')
                 }
@@ -1971,7 +1993,7 @@ export default class AppendEditor extends React.Component<{}, AppendInterface> {
                 id={HtmlElementId.helpButton}
                 key={HtmlElementId.helpButton}
                 onClick={this.toggleShowHelp}
-                title="Help"
+                title="帮助"
                 className={'sk-button ' + (this.state.showHelp ? 'on' : 'off')}
               >
                 <HelpIcon condition={this.state.showHelp} role={'button'} />
@@ -1981,7 +2003,7 @@ export default class AppendEditor extends React.Component<{}, AppendInterface> {
                 id={HtmlElementId.settingsButton}
                 key={HtmlElementId.settingsButton}
                 onClick={this.onSettingsMode}
-                title="Settings"
+                title="设置"
                 className={
                   'sk-button ' + (this.state.settingsMode ? 'on' : 'off')
                 }
@@ -2010,7 +2032,7 @@ export default class AppendEditor extends React.Component<{}, AppendInterface> {
                 id={HtmlElementId.scrollToBottomButtonHeader}
                 key={HtmlElementId.scrollToBottomButtonHeader}
                 onClick={this.skipToBottom}
-                title="Scroll to Bottom"
+                title="滚动到底部"
                 className={'sk-button off'}
               >
                 <svg
@@ -2033,7 +2055,7 @@ export default class AppendEditor extends React.Component<{}, AppendInterface> {
                 id={HtmlElementId.scrollToTopButtonHeader}
                 key={HtmlElementId.scrollToTopButtonHeader}
                 onClick={this.skipToTop}
-                title="Scroll to Top"
+                title="滚动到顶部"
                 className={'sk-button off'}
               >
                 <svg
@@ -2056,7 +2078,7 @@ export default class AppendEditor extends React.Component<{}, AppendInterface> {
                 id={HtmlElementId.menuButton}
                 key={HtmlElementId.menuButton}
                 onClick={this.toggleShowMenu}
-                title="Toggle Menu"
+                title="更多菜单"
                 className={'sk-button ' + (this.state.showMenu ? 'on' : 'off')}
               >
                 <MenuIcon condition={this.state.showMenu} role="button" />
@@ -2117,8 +2139,8 @@ export default class AppendEditor extends React.Component<{}, AppendInterface> {
           {this.state.settingsMode && (
             <ErrorBoundary>
               <Settings
-                cancelText="Cancel"
-                confirmText="Save"
+                cancelText="取消"
+                confirmText="保存"
                 customStyles={this.state.customStyles}
                 debugMode={debugMode}
                 defaultSettings={this.state.defaultSettings}
@@ -2126,17 +2148,17 @@ export default class AppendEditor extends React.Component<{}, AppendInterface> {
                 fontEdit={this.state.fontEdit}
                 fontSize={this.state.fontSize}
                 fontView={this.state.fontView}
-                helpLink={'https://github.com/theodorechu/append-editor/#settings'}
+                helpLink={'https://github.com/Luxciax/append-editor#rich-markdown-editor'}
                 key={HtmlElementId.settings}
                 keyMap={keyMap}
                 onConfirm={this.onSaveSettings}
                 onCancel={this.onSettingsMode}
-                title={`Append Editor Settings`}
+                title={`Append Editor Rich 设置`}
                 monacoEditorLanguage={this.state.monacoEditorLanguage}
               />
             </ErrorBoundary>
           )}
-          {this.state.editMode && !this.state.refreshEdit && (
+          {!richMode && this.state.editMode && !this.state.refreshEdit && (
             <ErrorBoundary>
               <EditNote
                 debugMode={debugMode}
@@ -2155,7 +2177,7 @@ export default class AppendEditor extends React.Component<{}, AppendInterface> {
               />
             </ErrorBoundary>
           )}
-          {this.state.editMode && this.state.refreshEdit && (
+          {!richMode && this.state.editMode && this.state.refreshEdit && (
             <ErrorBoundary>
               <EditNote
                 debugMode={debugMode}
@@ -2174,11 +2196,17 @@ export default class AppendEditor extends React.Component<{}, AppendInterface> {
               />
             </ErrorBoundary>
           )}
-          {this.state.editingMode === EditingModes.useDynamicEditor && (
-            /** Keep a flex spacer for backwards-compatible layout behavior. */
-            <div aria-hidden="true"></div>
+          {richMode && !this.state.settingsMode && (
+            <ErrorBoundary>
+              <DynamicEditor
+                debugMode={debugMode}
+                text={this.state.text}
+                onChange={this.saveText}
+                readOnly={false}
+              />
+            </ErrorBoundary>
           )}
-          {this.state.viewMode && !this.state.refreshView && (
+          {!richMode && this.state.viewMode && !this.state.refreshView && (
             <ErrorBoundary>
               <ViewNote
                 appendMode={this.state.appendMode}
@@ -2195,7 +2223,7 @@ export default class AppendEditor extends React.Component<{}, AppendInterface> {
               />
             </ErrorBoundary>
           )}
-          {this.state.viewMode && this.state.refreshView && (
+          {!richMode && this.state.viewMode && this.state.refreshView && (
             <ErrorBoundary>
               <ViewNote
                 appendMode={this.state.appendMode}
