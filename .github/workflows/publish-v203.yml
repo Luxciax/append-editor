@@ -1,0 +1,44 @@
+name: publish-append-editor-rich-v203
+
+permissions:
+  contents: write
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  publish:
+    if: contains(github.event.head_commit.message, '[publish-v203]')
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'yarn'
+      - name: Install dependencies
+        run: yarn install --frozen-lockfile --ignore-engines
+      - name: Production build
+        env:
+          CI: 'false'
+        run: yarn build
+      - name: Package release
+        run: |
+          cd build
+          zip -qr ../append-editor-rich-v2.0.3.zip .
+      - name: Publish hosted build branch
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git remote set-url origin "https://x-access-token:${GH_TOKEN}@github.com/Luxciax/append-editor.git"
+          npx gh-pages -d build -b gh-pages
+      - name: Create GitHub Release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh release create v2.0.3 append-editor-rich-v2.0.3.zip             --title "Append Editor Rich v2.0.3"             --notes "UI layout fix release: removes the intrusive empty-block floating insert menu that covered the typing position; keeps insertion in the top toolbar and slash commands; fixes toolbar clipping, control shrinking, and alignment on narrow widths; preserves left-aligned top and formatting toolbars."
