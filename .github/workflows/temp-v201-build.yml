@@ -25,3 +25,5 @@ jobs:
         env:
           CI: 'false'
         run: yarn build
+
+# final v2.0.1 validation
