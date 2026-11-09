@@ -31,7 +31,7 @@ const PrintDialog: React.FC<PrintDialogTypes> = ({
             <button
               id={HtmlElementId.undoDialogButton}
               onClick={onUndo}
-              title="Close"
+              title="关闭"
             >
               <span>&nbsp;</span>
               <CloseIcon role="button" />
@@ -39,11 +39,11 @@ const PrintDialog: React.FC<PrintDialogTypes> = ({
             </button>
           </div>
           <p>
-            Need help deciding? Check out the{' '}
+            需要帮助？请查看{' '}
             <a href={helpLink} target="_blank" rel="noopener noreferrer">
-              documentation
+              使用说明
             </a>
-            .
+            。
           </p>
         </div>
       </div>
