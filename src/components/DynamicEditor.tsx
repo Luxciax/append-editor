@@ -24,7 +24,16 @@ import { FindAndReplace } from '@tiptap/extension-find-and-replace';
 import Mathematics from '@tiptap/extension-mathematics';
 import CodeBlockLowlight from '@tiptap/extension-code-block-lowlight';
 import Youtube from '@tiptap/extension-youtube';
-import { common, createLowlight } from 'lowlight';
+import { createLowlight } from 'lowlight';
+import bash from 'highlight.js/lib/languages/bash';
+import css from 'highlight.js/lib/languages/css';
+import java from 'highlight.js/lib/languages/java';
+import javascript from 'highlight.js/lib/languages/javascript';
+import json from 'highlight.js/lib/languages/json';
+import python from 'highlight.js/lib/languages/python';
+import sql from 'highlight.js/lib/languages/sql';
+import typescript from 'highlight.js/lib/languages/typescript';
+import xml from 'highlight.js/lib/languages/xml';
 import DOMPurify from 'dompurify';
 import Callout, { CalloutType } from '../extensions/Callout';
 import OutlineList from '../extensions/OutlineList';
@@ -33,7 +42,19 @@ import WebEmbed from '../extensions/WebEmbed';
 import MediaEmbed, { MediaKind } from '../extensions/MediaEmbed';
 import 'katex/dist/katex.min.css';
 
-const lowlight = createLowlight(common);
+const lowlight = createLowlight();
+lowlight.register({
+  bash,
+  css,
+  html: xml,
+  java,
+  javascript,
+  json,
+  python,
+  sql,
+  typescript,
+  xml,
+});
 
 interface DynamicProps {
   debugMode: boolean;
