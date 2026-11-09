@@ -1,7 +1,7 @@
 {
-  "name": "append-editor",
-  "version": "1.2.6",
-  "description": "Append to your notes",
+  "name": "append-editor-rich",
+  "version": "2.0.0",
+  "description": "Modern rich Markdown editor for Standard Notes",
   "keywords": [
     "Append Editor",
     "Standard Notes",
@@ -9,14 +9,14 @@
     "KaTeX"
   ],
   "private": true,
-  "author": "Theodore Chu",
+  "author": "Theodore Chu and contributors; rich-editor fork maintained by Luxciax",
   "license": "AGPL-3.0-or-later",
   "repository": {
     "type": "git",
-    "url": "https://github.com/TheodoreChu/append-editor.git"
+    "url": "https://github.com/Luxciax/append-editor.git"
   },
   "bugs": {
-    "url": "https://github.com/TheodoreChu/append-editor/issues"
+    "url": "https://github.com/Luxciax/append-editor/issues"
   },
   "sn": {
     "main": "index.html"
