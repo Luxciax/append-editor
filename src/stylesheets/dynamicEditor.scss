@@ -44,6 +44,7 @@
   display: flex;
   flex-wrap: wrap;
   align-items: center;
+  justify-content: flex-start;
   gap: 6px;
   padding: 7px 10px;
   border-bottom: 1px solid var(--sn-stylekit-border-color);
@@ -64,7 +65,7 @@
 }
 
 .rich-toolbar-spacer {
-  margin-left: auto;
+  margin-left: 0;
 }
 
 .rich-storage-badge {
