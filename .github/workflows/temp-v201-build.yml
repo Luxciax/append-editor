@@ -27,3 +27,4 @@ jobs:
         run: yarn build
 
 # final v2.0.1 validation
+# latest-main validation
