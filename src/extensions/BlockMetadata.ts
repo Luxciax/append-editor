@@ -13,6 +13,7 @@ const blockTypes = [
   'table',
   'youtube',
   'webEmbed',
+  'mediaEmbed',
 ];
 
 export const createBlockId = () => {
