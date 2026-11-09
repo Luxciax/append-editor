@@ -212,7 +212,7 @@ export default class AppendText extends React.Component<
             id={HtmlElementId.appendTextArea}
             name="text"
             className="sk-input contrast textarea append"
-            placeholder="Append to your note"
+            placeholder="追加到当前笔记"
             rows={this.props.appendRows}
             spellCheck="true"
             value={text}
@@ -231,7 +231,7 @@ export default class AppendText extends React.Component<
                 checked={this.state.newLine}
                 onChange={this.handleInputChange}
               />
-              New Line
+              新起一行
             </label>
             <br />
             <label>
@@ -242,7 +242,7 @@ export default class AppendText extends React.Component<
                 checked={this.state.newParagraph}
                 onChange={this.handleInputChange}
               />
-              New Paragraph
+              新起一段
             </label>
           </form>
           <div className="sk-button-group stretch">
@@ -252,7 +252,7 @@ export default class AppendText extends React.Component<
               onClick={this.appendTextToNote}
               className="sk-button info"
             >
-              <div>Append</div>
+              <div>追加</div>
             </button>
           </div>
         </div>
