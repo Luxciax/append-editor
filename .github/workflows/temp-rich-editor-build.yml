@@ -1,4 +1,5 @@
 name: temporary-rich-editor-build-check
+# peer-chain validation
 
 permissions:
   contents: write
