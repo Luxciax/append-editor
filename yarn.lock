@@ -2416,7 +2416,7 @@
   dependencies:
     "@floating-ui/utils" "^0.2.12"
 
-"@floating-ui/dom@^1.0.0", "@floating-ui/dom@^1.6.0":
+"@floating-ui/dom@^1.0.0", "@floating-ui/dom@^1.6.0", "@floating-ui/dom@^1.6.13":
   version "1.8.0"
   resolved "https://registry.yarnpkg.com/@floating-ui/dom/-/dom-1.8.0.tgz#8a20e6facbe2456afdbeb6c8b968a72df689cf63"
   integrity sha512-yXSrzeHZBTZadLOlfyhCkJHNeLJnHRnRInwdZ40L7ZiaAtrBwoYlsDrX3v5zB1Utk7CLfzcOVnVVWoXEky7Ceg==
@@ -3212,6 +3212,18 @@
   resolved "https://registry.yarnpkg.com/@tiptap/extension-document/-/extension-document-3.33.0.tgz#4a54fc4562197b6d57b57ed2eef1fa8a5dcb2e4c"
   integrity sha512-XVe6qsjISJbstbzT8QYAL6s4GN9AA1trAcKAIH/xhxXlaTGwl7RADqHxoTG0KQUbME7NfCQpKhxIDJWSXdnlgw==
 
+"@tiptap/extension-drag-handle-react@3.33.0":
+  version "3.33.0"
+  resolved "https://registry.yarnpkg.com/@tiptap/extension-drag-handle-react/-/extension-drag-handle-react-3.33.0.tgz#bbd26e3268b6e453b379ee2f1c7553a01a7bd213"
+  integrity sha512-vuE2l7W3lVgt6EGrvQAUqvEh/8SSlA/3M4rVh72mR838rnRmxyKMLzCVRCCHw4mDXo9RRrcetWejgZwsDnGrlQ==
+
+"@tiptap/extension-drag-handle@3.33.0":
+  version "3.33.0"
+  resolved "https://registry.yarnpkg.com/@tiptap/extension-drag-handle/-/extension-drag-handle-3.33.0.tgz#f58f0afa78792771cdac0b46f283b076236100c1"
+  integrity sha512-Bsd8HA6d7905S16EdwGCBOwVpwRyZonDKBHSHH1zDd4WGLCfeF12Evxi49fRgXeJ4x3os7FeWb/dsxNU4Tsj6g==
+  dependencies:
+    "@floating-ui/dom" "^1.6.13"
+
 "@tiptap/extension-dropcursor@3.33.0":
   version "3.33.0"
   resolved "https://registry.yarnpkg.com/@tiptap/extension-dropcursor/-/extension-dropcursor-3.33.0.tgz#619eaa40095a752dcdc565841bd952a029a59ce8"
@@ -3340,6 +3352,11 @@
   version "3.33.0"
   resolved "https://registry.yarnpkg.com/@tiptap/extension-underline/-/extension-underline-3.33.0.tgz#163a18cd622959d855029ce78878c814d5f9b01e"
   integrity sha512-6pvLaSRdxUgNpSOCOvraryg1S4hRKSawMQz6wD6EKIRZ/nn4aw2FHYvfnHCsIg2aw+ngEcOCr0b+t77yhVpAXg==
+
+"@tiptap/extension-youtube@3.33.0":
+  version "3.33.0"
+  resolved "https://registry.yarnpkg.com/@tiptap/extension-youtube/-/extension-youtube-3.33.0.tgz#d94d966f0643cba97c46022c3bd90c0ca76c9ad0"
+  integrity sha512-HHJtmP+mfAT/0GTTFVI0Kf1pVocxfl9bDztro9OxOri/bYZWOtdn8rEBS6fzM9Wca2EJZaF5/c2Gs4X+u7e1IA==
 
 "@tiptap/extensions@3.33.0":
   version "3.33.0"
@@ -3849,7 +3866,7 @@
   dependencies:
     "@types/jest" "*"
 
-"@types/trusted-types@^2.0.2":
+"@types/trusted-types@^2.0.2", "@types/trusted-types@^2.0.7":
   version "2.0.7"
   resolved "https://registry.yarnpkg.com/@types/trusted-types/-/trusted-types-2.0.7.tgz#baccb07a970b91707df3a3e8ba6896c57ead2d11"
   integrity sha512-ScaPdn1dQczgbl0QFTeTOmVHFULt394XJgOQNoyVhZ6r2vLnMLJfBPd53SB52T/3G36VI1/g2MZaX0cwDuXsfw==
@@ -5983,6 +6000,13 @@ domhandler@^4.0.0, domhandler@^4.2.0, domhandler@^4.3.1:
   dependencies:
     domelementtype "^2.2.0"
 
+dompurify@3.4.17:
+  version "3.4.17"
+  resolved "https://registry.yarnpkg.com/dompurify/-/dompurify-3.4.17.tgz#074bbb24eaa419535ac19ffe7f663104b0e1543d"
+  integrity sha512-B/pSlYVHQ58kqISD/yDjuJ1yfzI34m1gF4lAod2bwSRhiN4K5Cl3H8Af7hqB2PmTL911tdEudnnXn5FnhRoz0w==
+  optionalDependencies:
+    "@types/trusted-types" "^2.0.7"
+
 domutils@^1.7.0:
   version "1.7.0"
   resolved "https://registry.yarnpkg.com/domutils/-/domutils-1.7.0.tgz#56ea341e834e06e6748af7a1cb25da67ea9f8c2a"
@@ -6887,16 +6911,6 @@ filenamify@^1.0.0:
     filename-reserved-regex "^1.0.0"
     strip-outer "^1.0.0"
     trim-repeated "^1.0.0"
-
-filesafe-embed@^1.0.10:
-  version "1.0.10"
-  resolved "https://registry.yarnpkg.com/filesafe-embed/-/filesafe-embed-1.0.10.tgz#23e95275693086c05ad0dedc2d970ff55a64a21c"
-  integrity sha512-C1h5T1kLIhiA2AM1rV1mVH+vaKQHL36q9L35uR8r3AvJJ88Xu6P0Urgd2ibI4pcIp3ouy6g0dnXq/d+7cwCyVg==
-
-filesafe-js@^1.0.4:
-  version "1.0.4"
-  resolved "https://registry.yarnpkg.com/filesafe-js/-/filesafe-js-1.0.4.tgz#790a42bb760d1acea5a30f8f28a3dd7fdfc8a633"
-  integrity sha512-WdDfxW1sIjjZgUVqtyeBYCB6rD5xIZ8yjClsegvJiwDGo75cBn6V5cTb3aa4LotEysy1FxLNUHokN8jbVqxGuA==
 
 filesize@^8.0.6:
   version "8.0.7"
