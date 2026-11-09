@@ -115,10 +115,7 @@
     "@tiptap/extension-code-block": "3.33.0",
     "highlight.js": "11.12.0",
     "yjs": "13.6.33",
-    "y-protocols": "1.0.7",
-    "prosemirror-view": "1.42.9",
-    "prosemirror-model": "1.25.13",
-    "prosemirror-state": "1.4.4"
+    "y-protocols": "1.0.7"
   },
   "eslintConfig": {
     "extends": [
@@ -152,6 +149,11 @@
     ]
   },
   "resolutions": {
-    "@standardnotes/component-relay": "2.2.2"
+    "@standardnotes/component-relay": "2.2.2",
+    "prosemirror-keymap": "1.2.3",
+    "prosemirror-model": "1.25.13",
+    "prosemirror-state": "1.4.4",
+    "prosemirror-transform": "1.12.5",
+    "prosemirror-view": "1.42.9"
   }
 }
