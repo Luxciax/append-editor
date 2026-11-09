@@ -30,6 +30,7 @@ import Callout, { CalloutType } from '../extensions/Callout';
 import OutlineList from '../extensions/OutlineList';
 import BlockMetadata, { createBlockId } from '../extensions/BlockMetadata';
 import WebEmbed from '../extensions/WebEmbed';
+import MediaEmbed, { MediaKind } from '../extensions/MediaEmbed';
 import 'katex/dist/katex.min.css';
 
 const lowlight = createLowlight(common);
@@ -180,6 +181,18 @@ const SLASH_COMMANDS: SlashCommandDefinition[] = [
     keywords: 'web iframe embed page media',
   },
   {
+    id: 'audio',
+    label: 'Audio',
+    description: 'Embed remote HTTPS audio',
+    keywords: 'audio sound music media',
+  },
+  {
+    id: 'video',
+    label: 'Video',
+    description: 'Embed remote HTTPS video',
+    keywords: 'video movie media',
+  },
+  {
     id: 'divider',
     label: 'Divider',
     description: 'Horizontal rule',
@@ -252,7 +265,8 @@ const hasRichOnlyFormatting = (node: any): boolean => {
     node.type === 'callout' ||
     node.type === 'outlineList' ||
     node.type === 'youtube' ||
-    node.type === 'webEmbed'
+    node.type === 'webEmbed' ||
+    node.type === 'mediaEmbed'
   ) {
     return true;
   }
@@ -299,6 +313,7 @@ const serializeEditorContent = (editor: any) =>
 const supportedHtmlTags = new Set([
   'a',
   'aside',
+  'audio',
   'b',
   'blockquote',
   'br',
@@ -328,6 +343,7 @@ const supportedHtmlTags = new Set([
   'sup',
   'table',
   'tbody',
+  'video',
   'td',
   'th',
   'thead',
@@ -444,6 +460,7 @@ export default function DynamicEditor({
       OutlineList,
       Callout,
       WebEmbed,
+      MediaEmbed,
       Youtube.configure({
         controls: true,
         nocookie: true,
@@ -776,6 +793,27 @@ export default function DynamicEditor({
     }
   };
 
+  const insertMedia = (kind: MediaKind) => {
+    const value = window.prompt(
+      kind === 'video' ? 'HTTPS video URL' : 'HTTPS audio URL'
+    );
+    if (!value?.trim()) return;
+
+    const title =
+      window.prompt(kind === 'video' ? 'Video title (optional)' : 'Audio title (optional)') ||
+      (kind === 'video' ? 'Video' : 'Audio');
+
+    const ok = editor
+      .chain()
+      .focus()
+      .setMediaEmbed({ kind, src: value.trim(), title })
+      .run();
+
+    if (!ok) {
+      window.alert('Only valid HTTPS media URLs can be embedded.');
+    }
+  };
+
   const insertInlineMath = () => {
     const latex = window.prompt('Inline LaTeX formula', 'E = mc^2');
     if (!latex?.trim()) return;
@@ -969,6 +1007,14 @@ export default function DynamicEditor({
       case 'web-embed':
         chain.run();
         window.setTimeout(insertWebEmbed, 0);
+        break;
+      case 'audio':
+        chain.run();
+        window.setTimeout(() => insertMedia('audio'), 0);
+        break;
+      case 'video':
+        chain.run();
+        window.setTimeout(() => insertMedia('video'), 0);
         break;
       case 'divider':
         chain.setHorizontalRule().run();
@@ -1506,6 +1552,20 @@ export default function DynamicEditor({
             onClick={insertWebEmbed}
           >
             Embed
+          </ToolbarButton>
+          <ToolbarButton
+            title="Insert remote audio"
+            disabled={sourceMode || readOnly}
+            onClick={() => insertMedia('audio')}
+          >
+            Audio
+          </ToolbarButton>
+          <ToolbarButton
+            title="Insert remote video"
+            disabled={sourceMode || readOnly}
+            onClick={() => insertMedia('video')}
+          >
+            Video
           </ToolbarButton>
           <ToolbarButton
             title="Insert inline formula"
