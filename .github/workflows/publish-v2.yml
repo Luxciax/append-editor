@@ -30,9 +30,12 @@ jobs:
           cd build
           zip -qr ../append-editor-rich-v2.0.0.zip .
       - name: Publish GitHub Pages branch
+        env:
+          GH_TOKEN: ${{ github.token }}
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git remote set-url origin "https://x-access-token:${GH_TOKEN}@github.com/Luxciax/append-editor.git"
           npx gh-pages -d build -b gh-pages
       - name: Create GitHub Release
         env:
