@@ -1,5 +1,5 @@
 import React from 'react';
-import prettier from 'prettier';
+import prettier from 'prettier/standalone';
 import parserMarkdown from 'prettier/parser-markdown';
 import { EditingModes } from './AppendEditor';
 import {
@@ -112,11 +112,11 @@ export default class Menu extends React.Component<MenuProps, MenuState> {
 
   copyText = () => {
     if (this.props.text) {
-      this.setState({ message: 'Copied Text to clipboard' }, () => {
+      this.setState({ message: '已复制笔记文本到剪贴板' }, () => {
         this.copyToClipboard(this.props.text);
       });
     } else {
-      this.setState({ message: 'No text to copy. Your note is empty' }, () => {
+      this.setState({ message: '没有可复制的内容，当前笔记为空' }, () => {
         this.showMessageShare();
       });
     }
@@ -125,17 +125,17 @@ export default class Menu extends React.Component<MenuProps, MenuState> {
   copyHtml = () => {
     if (!this.props.viewMode) {
       this.setState(
-        { message: 'Unable to copy HTML. Please turn View Mode on' },
+        { message: '当前模式无法复制渲染后的 HTML' },
         () => this.showMessageShare()
       );
     } else if (!this.props.text) {
-      this.setState({ message: 'No HTML to copy. Your note is empty' }, () => {
+      this.setState({ message: '没有可复制的 HTML，当前笔记为空' }, () => {
         this.showMessageShare();
       });
     } else {
       const renderedNote = document.getElementById('renderedNote');
       if (renderedNote?.firstElementChild?.innerHTML) {
-        this.setState({ message: 'Copied HTML to clipboard' });
+        this.setState({ message: '已复制渲染后的 HTML 到剪贴板' });
         this.copyToClipboard(renderedNote?.firstElementChild.innerHTML);
       }
     }
@@ -149,7 +149,7 @@ export default class Menu extends React.Component<MenuProps, MenuState> {
       this.setState(
         {
           message:
-            'Error: Your Monaco Editor language is not Markdown. Formatting is only available for Markdown',
+            '错误：Monaco 当前语言不是 Markdown，格式化仅支持 Markdown',
         },
         () => {
           this.showMessageEdit();
@@ -157,7 +157,7 @@ export default class Menu extends React.Component<MenuProps, MenuState> {
       );
     } else if (this.props.text) {
       this.setState(
-        { message: 'Formatted Markdown text with Prettier' },
+        { message: '已使用 Prettier 格式化 Markdown' },
         () => {
           try {
             const formattedText = prettier.format(this.props.text, {
@@ -169,16 +169,16 @@ export default class Menu extends React.Component<MenuProps, MenuState> {
             this.props.refreshView();
             this.showMessageEdit();
           } catch (e) {
-            this.setState({ message: 'Error formatting text: ' + e }, () => {
+            this.setState({ message: '格式化失败：' + e }, () => {
               this.showMessageEdit();
             });
-            console.log('Error formatting text: ' + e);
+            console.log('格式化失败：' + e);
           }
         }
       );
     } else {
       this.setState(
-        { message: 'No text to format. Your note is empty' },
+        { message: '没有可格式化的内容，当前笔记为空' },
         () => {
           this.showMessageEdit();
         }
@@ -194,11 +194,11 @@ export default class Menu extends React.Component<MenuProps, MenuState> {
       this.props.saveText(newText);
       this.props.refreshEdit();
       this.props.refreshView();
-      this.setState({ message: 'Unchecked all checkboxes' }, () => {
+      this.setState({ message: '已取消勾选全部任务' }, () => {
         this.showMessageEdit();
       });
     } else {
-      this.setState({ message: 'No checked checkboxes found' }, () => {
+      this.setState({ message: '没有找到已勾选的任务' }, () => {
         this.showMessageEdit();
       });
     }
@@ -214,31 +214,31 @@ export default class Menu extends React.Component<MenuProps, MenuState> {
       />,
       <div id={HtmlElementId.menu} key={HtmlElementId.menu}>
         <ChevronToggleButton
-          caption={'Appearance'}
+          caption={'外观'}
           className={HtmlClassName.chevronToggleButton}
           condition={this.props.showMenuOptionsView}
           key={'appearance'}
           onClick={this.props.toggleShowMenuOptionsView}
-          title={'Toggle show options for the appearance of the editor'}
+          title={'展开/收起编辑器外观选项'}
         />
         {this.props.showMenuOptionsView && [
           <EyeButton
-            caption={'Borderless'}
+            caption={'无边框'}
             className={
               HtmlClassName.menuButton +
               (this.props.borderlessMode ? HtmlClassName.on : HtmlClassName.off)
             }
             condition={this.props.borderlessMode}
             key={'borderless'}
-            messageOn={'on'}
-            messageOff={'off'}
+            messageOn={'开启'}
+            messageOff={'关闭'}
             onClick={this.props.toggleBorderlessMode}
             title={
-              'Toggle Borderless Mode. Blends borders and margins into the background for a cleaner look'
+              '切换无边框模式，让边框和边距融入背景'
             }
           />,
           <EyeButton
-            caption={'Fixed Height'}
+            caption={'固定高度'}
             className={
               HtmlClassName.menuButton +
               (this.props.fixedHeightMode
@@ -247,80 +247,80 @@ export default class Menu extends React.Component<MenuProps, MenuState> {
             }
             condition={this.props.fixedHeightMode}
             key={'fixed-height'}
-            messageOn={'on'}
-            messageOff={'off'}
+            messageOn={'开启'}
+            messageOff={'关闭'}
             onClick={this.props.toggleFixedHeightMode}
             title={
-              'Toggle Fixed Height Mode. Limits the height of the content container for easier side-by-side editing'
+              '切换固定高度模式，便于并排编辑'
             }
           />,
           <EyeButton
-            caption={'Full Width'}
+            caption={'全宽'}
             className={
               HtmlClassName.menuButton +
               (this.props.fullWidthMode ? HtmlClassName.on : HtmlClassName.off)
             }
             condition={this.props.fullWidthMode}
             key={'full-width'}
-            messageOn={'on'}
-            messageOff={'off'}
+            messageOn={'开启'}
+            messageOff={'关闭'}
             onClick={this.props.toggleFullWidthMode}
             title={
-              'Toggle Full Width Mode for unrestricted editing. Borderless mode plus unset maximum container widths'
+              '切换全宽模式，取消内容最大宽度限制'
             }
           />,
           <EyeButton
-            caption={'Horizontal Overflow'}
+            caption={'横向溢出'}
             className={
               HtmlClassName.menuButton +
               (this.props.overflowMode ? HtmlClassName.on : HtmlClassName.off)
             }
             condition={this.props.overflowMode}
             key={'horizontal-overflow'}
-            messageOn={'visible'}
-            messageOff={'auto'}
+            messageOn={'显示'}
+            messageOff={'自动'}
             onClick={this.props.toggleOverflowMode}
             title={
-              'Toggle Horizontal Overflow. Visible is great for editing and viewing large tables and preformatted text. Works best with Full Width mode'
+              '切换横向溢出，适合宽表格和预格式化内容'
             }
           />,
         ]}
         <ChevronToggleButton
-          caption={'Share'}
+          caption={'分享'}
           className={HtmlClassName.chevronToggleButton}
           condition={this.props.showMenuOptionsShare}
           key={'share'}
           onClick={this.props.toggleShowMenuOptionsShare}
-          title={'Toggle show options to share your note'}
+          title={'展开/收起分享选项'}
         />
         {this.props.showMenuOptionsShare && [
           <CopyButton
-            caption={'Copy note text'}
+            caption={'复制笔记文本'}
             className={HtmlClassName.menuButton}
             fill={'var(--sn-stylekit-success-color)'}
             key={'copy-note-text'}
             onClick={this.copyText}
-            title={"Copy the text of your note to your device's clipboard"}
+            title={'复制笔记原始文本到剪贴板'}
           />,
           <CopyButton
-            caption={'Copy rendered HTML'}
+            caption={'复制渲染 HTML'}
             className={HtmlClassName.menuButton}
             fill={'var(--sn-stylekit-success-color)'}
             key={'copy-rendered-html'}
             onClick={this.copyHtml}
             title={
-              "Copy the rendered HTML from your note text to your device's clipboard"
+              '复制渲染后的 HTML 到剪贴板'
             }
           />,
           <PrintButton
-            caption={'Print rendered note'}
+            caption={'打印笔记'}
             className={'menu-button off'}
             fill={'var(--sn-stylekit-foreground-color)'}
             key={'print-rendered-note'}
             id={HtmlElementId.printButton}
             onClick={this.props.onConfirmPrintUrl}
             title={
-              'Print rendered note. Works best on the web app in Chromium browsers (e.g., MS Edge, Google Chrome). Not available on mobile'
+              '打印当前笔记；桌面 Chromium 环境兼容性最好'
             }
           />,
           <div
@@ -335,31 +335,31 @@ export default class Menu extends React.Component<MenuProps, MenuState> {
           </div>,
         ]}
         <ChevronToggleButton
-          caption={'Actions'}
+          caption={'操作'}
           className={HtmlClassName.chevronToggleButton}
           condition={this.props.showMenuOptionsEdit}
           onClick={this.props.toggleShowMenuOptionsEdit}
-          title={'Toggle show actions to quickly format and edit your note'}
+          title={'展开/收起快捷编辑操作'}
         />
         {this.props.showMenuOptionsEdit && [
           <PencilButton
-            caption={'Format Markdown text'}
+            caption={'格式化 Markdown'}
             className={HtmlClassName.menuButton}
             fill={'var(--sn-stylekit-warning-color)'}
             key={'format-markdown-text'}
             onClick={this.formatText}
             title={
-              'Format Markdown text with Prettier. WARNING: this may cause undesired changes to your note text. Use the Note History feature to revert unwanted changes'
+              '使用 Prettier 格式化 Markdown；可能会改写部分源码排版'
             }
           />,
           <PencilButton
-            caption={'Uncheck all checkboxes'}
+            caption={'取消全部任务勾选'}
             className={HtmlClassName.menuButton}
             fill={'var(--sn-stylekit-danger-color)'}
             key={'uncheck-all-checkboxes'}
             onClick={this.uncheckBoxes}
             title={
-              'Uncheck all checkboxes. DANGER: this may cause undesired changes to your note text. Use the Note History feature to revert unwanted changes'
+              '取消当前笔记中所有任务勾选状态'
             }
           />,
           <div
