@@ -1,0 +1,41 @@
+name: publish-append-editor-rich-v2
+
+permissions:
+  contents: write
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  publish:
+    if: contains(github.event.head_commit.message, '[publish-v2]')
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'yarn'
+      - name: Install dependencies
+        run: yarn install --frozen-lockfile --ignore-engines
+      - name: Build
+        env:
+          CI: 'false'
+        run: yarn build
+      - name: Package release
+        run: |
+          cd build
+          zip -qr ../append-editor-rich-v2.0.0.zip .
+      - name: Publish GitHub Pages branch
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          npx gh-pages -d build -b gh-pages
+      - name: Create GitHub Release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh release create v2.0.0 append-editor-rich-v2.0.0.zip             --title "Append Editor Rich v2.0.0"             --notes "First rich-editor release of the Luxciax fork. Includes Tiptap/ProseMirror live WYSIWYG editing, slash commands, tables, KaTeX, callouts, find/replace, drag handles, outline lists, embeds, block IDs, sanitized rich paste, and Markdown-first storage with Rich HTML fallback."
