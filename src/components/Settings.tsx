@@ -63,7 +63,7 @@ export default class Settings extends React.Component<
     if (this.props.monacoEditorLanguage) {
       monacoEditorLanguage = this.props.monacoEditorLanguage;
     }
-    let editingMode = 'usePlainText';
+    let editingMode = EditingModes.useDynamicEditor;
     if (this.props.editingMode) {
       editingMode = this.props.editingMode;
     }
@@ -439,7 +439,7 @@ export default class Settings extends React.Component<
               <button
                 id={HtmlElementId.undoDialogButton}
                 onClick={onCancel}
-                title="Close"
+                title="关闭"
               >
                 <span>&nbsp;</span>
                 <CloseIcon role="button" />
@@ -449,25 +449,25 @@ export default class Settings extends React.Component<
             <section className="sk-panel-row settings">
               <div className="text-and-undo-button">
                 <p>
-                  Need help? Check out the{' '}
+                  需要帮助？请查看
                   <a href={helpLink} target="_blank" rel="noopener noreferrer">
-                    documentation
+                    使用说明
                   </a>
-                  . To clear all settings, click undo:&nbsp;
+                  。如需清空所有设置，请点击撤销按钮：&nbsp;
                 </p>
                 <UndoButton
                   onClick={this.clearAllSettings}
-                  title="Reset all Settings"
+                  title="重置全部设置"
                   id={resetAllSettingsID}
                 />
               </div>
             </section>
             <section className="sk-panel-row settings">
               <div className="text-and-undo-button">
-                <p>To load your personal default settings, click:&nbsp;</p>
+                <p>加载个人默认设置：&nbsp;</p>
                 <button
                   onClick={this.loadDefaultSettings}
-                  title="Load personal default settings"
+                  title="加载个人默认设置"
                 >
                   <RefreshIcon role="button" />
                 </button>
@@ -475,43 +475,12 @@ export default class Settings extends React.Component<
             </section>
             <section className="sk-panel-row settings">
               <div className="text-and-undo-button">
-                <p>Editing Mode: </p>
+                <p>编辑模式：</p>
                 <UndoButton
                   onClick={this.clearEditingMode}
-                  title="Reset Editing Mode to Plain Textarea"
+                  title="恢复为富文本所见即所得模式"
                 />
               </div>
-            </section>
-            <section className="sk-panel-row settings">
-              <label>
-                <input
-                  id={EditingModes.usePlainText}
-                  name={editingModeID}
-                  value={EditingModes.usePlainText}
-                  className="radio"
-                  type="radio"
-                  checked={this.state.editingMode === EditingModes.usePlainText}
-                  onChange={this.handleInputChange}
-                />
-                Plain Textarea: standard textarea with spellcheck (default,
-                mobile recommended)
-              </label>
-            </section>
-            <section className="sk-panel-row settings">
-              <label>
-                <input
-                  id={EditingModes.useCodeMirror}
-                  name={editingModeID}
-                  value={EditingModes.useCodeMirror}
-                  type="radio"
-                  className="radio"
-                  checked={
-                    this.state.editingMode === EditingModes.useCodeMirror
-                  }
-                  onChange={this.handleInputChange}
-                />
-                CodeMirror: in-line formatting for Markdown
-              </label>
             </section>
             <section className="sk-panel-row settings">
               <label>
@@ -526,9 +495,8 @@ export default class Settings extends React.Component<
                   }
                   onChange={this.handleInputChange}
                 />
-                Rich Markdown: live WYSIWYG editing with a full formatting
-                toolbar. Notes remain Markdown and can be switched to raw source
-                inside the editor. Desktop and mobile compatible.
+                富文本所见即所得：默认模式。直接在最终排版效果中编辑，支持工具栏、
+                / 命令、表格、公式、Callout 等；需要时可在编辑器工具栏切换源码。
               </label>
             </section>
             <section className="sk-panel-row settings">
@@ -544,15 +512,13 @@ export default class Settings extends React.Component<
                   }
                   onChange={this.handleInputChange}
                 />
-                Monaco: syntax highlighting for Markdown and many other
-                programming languages, intelligent auto-completion,
-                sophisticated search and replace (desktop recommended)
+                Monaco 源码模式：用于直接编辑 Markdown/代码，适合高级用户。
               </label>
             </section>
             {this.state.editingMode === EditingModes.useMonacoEditor && (
               <section className="sk-panel-row settings">
                 <label htmlFor={monacoEditorLanguageID}>
-                  Monaco Editor Language:{' '}
+                  Monaco 编辑语言：{' '}
                 </label>
                 <div className="input-and-undo-button">
                   <label>
@@ -636,13 +602,13 @@ export default class Settings extends React.Component<
                   </label>
                   <UndoButton
                     onClick={this.clearMonacoEditorLanguage}
-                    title="Reset Monaco Editor Language to Markdown"
+                    title="将 Monaco 语言重置为 Markdown"
                   />
                 </div>
               </section>
             )}
             <section className="sk-panel-row settings">
-              <label htmlFor={fontSizeID}>Choose a base font size: </label>
+              <label htmlFor={fontSizeID}>基础字号：</label>
               <div className="input-and-undo-button">
                 <select
                   id={fontSizeID}
@@ -673,14 +639,14 @@ export default class Settings extends React.Component<
                 </select>
                 <UndoButton
                   onClick={this.clearFontSize}
-                  title="Reset font size to 16px"
+                  title="将字号重置为 16px"
                 />
               </div>
             </section>
             {this.state.editingMode !== EditingModes.useMonacoEditor && (
               <section className="sk-panel-row settings">
                 <label htmlFor={fontEditID}>
-                  Choose a font for Edit/Append:{' '}
+                  编辑器字体：{' '}
                 </label>
                 <div className="input-and-undo-button">
                   <input
@@ -695,7 +661,7 @@ export default class Settings extends React.Component<
                   />
                   <UndoButton
                     onClick={this.clearFontEdit}
-                    title="Reset font for Edit/Append"
+                    title="重置编辑器字体"
                   />
                 </div>
               </section>
@@ -703,7 +669,7 @@ export default class Settings extends React.Component<
             {this.state.editingMode !== EditingModes.useDynamicEditor && (
               <section className="sk-panel-row settings">
                 <label htmlFor={fontViewID}>
-                  Choose a font for View/Print:{' '}
+                  查看/打印字体：{' '}
                 </label>
                 <div className="input-and-undo-button">
                   <input
@@ -718,24 +684,24 @@ export default class Settings extends React.Component<
                   />
                   <UndoButton
                     onClick={this.clearFontView}
-                    title="Reset font for View/Print"
+                    title="重置查看/打印字体"
                   />
                 </div>
               </section>
             )}
             <section className="sk-panel-row settings custom-css">
               <ChevronToggleButton
-                caption={'Add custom styles (CSS):'}
+                caption={'添加自定义样式（CSS）'}
                 className="chevron-toggle-button"
                 condition={this.state.showCustomStyles}
                 onClick={this.toggleShowCustomStyles}
-                title={'Toggle show add custom styles (CSS)'}
+                title={'展开/收起自定义 CSS'}
               />
               {this.state.showCustomStyles && (
                 <UndoButton
                   className={'custom-css-undo-button'}
                   onClick={this.clearCustomStyles}
-                  title="Reset custom styles (CSS)"
+                  title="重置自定义 CSS"
                 />
               )}
             </section>
@@ -753,7 +719,7 @@ export default class Settings extends React.Component<
             )}
             <section className="sk-panel-row settings">
               <label htmlFor={saveAsDefaultID}>
-                Save these settings as your personal default:{' '}
+                将这些设置保存为个人默认值：{' '}
               </label>
               <div className="input-and-undo-button">
                 <label className={'checkbox-input-label'}>
@@ -767,7 +733,7 @@ export default class Settings extends React.Component<
                 </label>
                 <UndoButton
                   onClick={this.clearSaveAsDefault}
-                  title="Clear save as default"
+                  title="取消保存为默认设置"
                 />
               </div>
             </section>
