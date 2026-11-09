@@ -7,6 +7,7 @@ import React, {
 } from 'react';
 import debounce from 'lodash/debounce';
 import { EditorContent, useEditor } from '@tiptap/react';
+import { DragHandle } from '@tiptap/extension-drag-handle-react';
 import { BubbleMenu, FloatingMenu } from '@tiptap/react/menus';
 import StarterKit from '@tiptap/starter-kit';
 import { Markdown } from '@tiptap/markdown';
@@ -22,8 +23,13 @@ import Superscript from '@tiptap/extension-superscript';
 import { FindAndReplace } from '@tiptap/extension-find-and-replace';
 import Mathematics from '@tiptap/extension-mathematics';
 import CodeBlockLowlight from '@tiptap/extension-code-block-lowlight';
+import Youtube from '@tiptap/extension-youtube';
 import { common, createLowlight } from 'lowlight';
+import DOMPurify from 'dompurify';
 import Callout, { CalloutType } from '../extensions/Callout';
+import OutlineList from '../extensions/OutlineList';
+import BlockMetadata, { createBlockId } from '../extensions/BlockMetadata';
+import WebEmbed from '../extensions/WebEmbed';
 import 'katex/dist/katex.min.css';
 
 const lowlight = createLowlight(common);
@@ -108,6 +114,12 @@ const SLASH_COMMANDS: SlashCommandDefinition[] = [
     keywords: 'ordered numbered list',
   },
   {
+    id: 'outline-list',
+    label: 'Outline list',
+    description: 'Hierarchical outline numbering',
+    keywords: 'outline nested hierarchy numbered list',
+  },
+  {
     id: 'task-list',
     label: 'Task list',
     description: 'Interactive checklist',
@@ -154,6 +166,18 @@ const SLASH_COMMANDS: SlashCommandDefinition[] = [
     label: 'Image',
     description: 'Insert image from URL',
     keywords: 'image picture photo url',
+  },
+  {
+    id: 'youtube',
+    label: 'YouTube',
+    description: 'Embed a YouTube video',
+    keywords: 'youtube video embed media',
+  },
+  {
+    id: 'web-embed',
+    label: 'Web embed',
+    description: 'Embed a sandboxed HTTPS page',
+    keywords: 'web iframe embed page media',
   },
   {
     id: 'divider',
@@ -224,7 +248,16 @@ const richOnlyMarks = new Set([
 const hasRichOnlyFormatting = (node: any): boolean => {
   if (!node) return false;
 
-  if (node.type === 'callout') {
+  if (
+    node.type === 'callout' ||
+    node.type === 'outlineList' ||
+    node.type === 'youtube' ||
+    node.type === 'webEmbed'
+  ) {
+    return true;
+  }
+
+  if (node.attrs && node.attrs.blockId) {
     return true;
   }
 
@@ -304,12 +337,29 @@ const supportedHtmlTags = new Set([
 ]);
 
 const hasPotentiallyUnsupportedHtml = (value: string) => {
-  const tags = value.matchAll(/<\/?([a-z][a-z0-9-]*)(?:\s[^>]*)?>/gi);
-  for (const match of tags) {
-    if (!supportedHtmlTags.has(match[1].toLowerCase())) {
+  if (!/<[a-z][\s\S]*>/i.test(value)) return false;
+
+  const documentValue = new DOMParser().parseFromString(value, 'text/html');
+  const elements = Array.from(documentValue.body.querySelectorAll('*'));
+
+  for (const element of elements) {
+    const tag = element.tagName.toLowerCase();
+
+    if (tag === 'iframe') {
+      if (
+        element.closest('[data-youtube-video]') ||
+        element.closest('[data-web-embed]')
+      ) {
+        continue;
+      }
+      return true;
+    }
+
+    if (!supportedHtmlTags.has(tag)) {
       return true;
     }
   }
+
   return false;
 };
 
@@ -391,6 +441,17 @@ export default function DynamicEditor({
       }),
       TaskList,
       TaskItem.configure({ nested: true }),
+      OutlineList,
+      Callout,
+      WebEmbed,
+      Youtube.configure({
+        controls: true,
+        nocookie: true,
+        modestBranding: true,
+        width: 720,
+        height: 405,
+      }),
+      BlockMetadata,
       TableKit.configure({
         table: {
           resizable: true,
@@ -404,7 +465,6 @@ export default function DynamicEditor({
       TextStyleKit,
       Subscript,
       Superscript,
-      Callout,
       Mathematics.configure({
         katexOptions: {
           throwOnError: false,
@@ -425,6 +485,11 @@ export default function DynamicEditor({
         class: 'append-rich-editor ProseMirror',
         spellcheck: 'true',
       },
+      transformPastedHTML: (html) =>
+        DOMPurify.sanitize(html, {
+          FORBID_TAGS: ['script', 'style', 'iframe', 'object', 'embed'],
+          FORBID_ATTR: ['srcdoc'],
+        }),
     },
     onUpdate: ({ editor: currentEditor }) => {
       const serialized = serializeEditorContent(currentEditor);
@@ -682,6 +747,35 @@ export default function DynamicEditor({
     editor.chain().focus().setImage({ src: value.trim(), alt }).run();
   };
 
+  const insertYoutube = () => {
+    const value = window.prompt('YouTube URL');
+    if (!value?.trim()) return;
+    const ok = editor
+      .chain()
+      .focus()
+      .setYoutubeVideo({ src: value.trim() })
+      .run();
+
+    if (!ok) {
+      window.alert('That does not look like a supported YouTube URL.');
+    }
+  };
+
+  const insertWebEmbed = () => {
+    const value = window.prompt('HTTPS page URL');
+    if (!value?.trim()) return;
+    const title = window.prompt('Embed title (optional)') || 'Embedded content';
+    const ok = editor
+      .chain()
+      .focus()
+      .setWebEmbed({ src: value.trim(), title })
+      .run();
+
+    if (!ok) {
+      window.alert('Only valid HTTPS URLs can be embedded.');
+    }
+  };
+
   const insertInlineMath = () => {
     const latex = window.prompt('Inline LaTeX formula', 'E = mc^2');
     if (!latex?.trim()) return;
@@ -714,6 +808,62 @@ export default function DynamicEditor({
     }
 
     editor.chain().focus().toggleCallout({ type }).run();
+  };
+
+  const getSelectedBlock = () => {
+    const { $from } = editor.state.selection;
+
+    for (let depth = $from.depth; depth >= 1; depth -= 1) {
+      const node = $from.node(depth);
+      if (Object.prototype.hasOwnProperty.call(node.attrs, 'blockId')) {
+        return {
+          node,
+          type: node.type.name,
+          blockId: node.attrs.blockId as string | null,
+        };
+      }
+    }
+
+    return null;
+  };
+
+  const assignBlockId = async () => {
+    const selected = getSelectedBlock();
+    if (!selected) {
+      window.alert('Place the cursor inside a supported block first.');
+      return;
+    }
+
+    const current = selected.blockId || '';
+    const requested = window.prompt(
+      'Block ID (leave empty to generate one)',
+      current
+    );
+
+    if (requested === null) return;
+
+    const blockId = requested.trim() || createBlockId();
+    editor
+      .chain()
+      .focus()
+      .updateAttributes(selected.type, { blockId })
+      .run();
+
+    try {
+      await navigator.clipboard?.writeText(`^${blockId}`);
+    } catch {
+      // Clipboard access is optional inside Standard Notes webviews.
+    }
+  };
+
+  const clearBlockId = () => {
+    const selected = getSelectedBlock();
+    if (!selected) return;
+    editor
+      .chain()
+      .focus()
+      .updateAttributes(selected.type, { blockId: null })
+      .run();
   };
 
   const currentHeading = [1, 2, 3, 4, 5, 6].find((level) =>
@@ -779,6 +929,9 @@ export default function DynamicEditor({
       case 'ordered-list':
         chain.toggleOrderedList().run();
         break;
+      case 'outline-list':
+        chain.toggleOutlineList().run();
+        break;
       case 'task-list':
         chain.toggleTaskList().run();
         break;
@@ -808,6 +961,14 @@ export default function DynamicEditor({
       case 'image':
         chain.run();
         window.setTimeout(insertImage, 0);
+        break;
+      case 'youtube':
+        chain.run();
+        window.setTimeout(insertYoutube, 0);
+        break;
+      case 'web-embed':
+        chain.run();
+        window.setTimeout(insertWebEmbed, 0);
         break;
       case 'divider':
         chain.setHorizontalRule().run();
@@ -1333,6 +1494,20 @@ export default function DynamicEditor({
             Image
           </ToolbarButton>
           <ToolbarButton
+            title="Insert YouTube video"
+            disabled={sourceMode || readOnly}
+            onClick={insertYoutube}
+          >
+            YouTube
+          </ToolbarButton>
+          <ToolbarButton
+            title="Insert sandboxed web embed"
+            disabled={sourceMode || readOnly}
+            onClick={insertWebEmbed}
+          >
+            Embed
+          </ToolbarButton>
+          <ToolbarButton
             title="Insert inline formula"
             disabled={sourceMode || readOnly}
             onClick={insertInlineMath}
@@ -1454,6 +1629,31 @@ export default function DynamicEditor({
             </ToolbarButton>
           </div>
         )}
+
+        <div className="rich-toolbar-group block-tools">
+          <ToolbarButton
+            title="Toggle outline list"
+            active={editor.isActive('outlineList')}
+            disabled={sourceMode || readOnly}
+            onClick={() => editor.chain().focus().toggleOutlineList().run()}
+          >
+            Outline
+          </ToolbarButton>
+          <ToolbarButton
+            title="Set/generate block ID and copy reference"
+            disabled={sourceMode || readOnly}
+            onClick={assignBlockId}
+          >
+            Block ID
+          </ToolbarButton>
+          <ToolbarButton
+            title="Remove block ID"
+            disabled={sourceMode || readOnly || !getSelectedBlock()?.blockId}
+            onClick={clearBlockId}
+          >
+            ID−
+          </ToolbarButton>
+        </div>
 
         <div className="rich-toolbar-group rich-toolbar-spacer">
           <span
@@ -1674,7 +1874,25 @@ export default function DynamicEditor({
           }}
         />
       ) : (
-        <EditorContent editor={editor} />
+        <>
+          {!readOnly && (
+            <DragHandle
+              editor={editor}
+              nested
+              className="append-block-drag-handle"
+            >
+              <button
+                type="button"
+                className="append-block-drag-button"
+                title="Drag block"
+                aria-label="Drag block"
+              >
+                ⋮⋮
+              </button>
+            </DragHandle>
+          )}
+          <EditorContent editor={editor} />
+        </>
       )}
 
       {!sourceMode && (
