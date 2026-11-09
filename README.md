@@ -495,3 +495,45 @@ Early stages of this editor were based heavily on the Standard Notes [Token Vaul
 - [Standard Notes Help](https://standardnotes.org/help) for help with issues related to Standard Notes but unrelated to this editor
 
 - Rich editor formatting also includes font family, font size, line height, bidirectional LTR/RTL controls, character/word counts, local date/time insertion, and language-aware highlighted code blocks.
+
+
+## Rich Markdown editor
+
+The fork now includes a modern Tiptap/ProseMirror editing mode designed to keep the
+Standard Notes integration while providing a Notesnook-style rich editing workflow.
+
+Highlights:
+
+- live WYSIWYG editing with an in-editor raw source toggle
+- headings, font family/size, line height, colors, highlights, alignment and LTR/RTL
+- bullet, numbered, task and hierarchical outline lists
+- typed Info/Tip/Warning/Danger callouts
+- KaTeX inline and block formulas with Markdown round-tripping
+- syntax-highlighted code blocks for Bash, CSS, HTML/XML, Java, JavaScript, JSON,
+  Python, SQL and TypeScript
+- advanced tables with row/column controls, headers, merge and split
+- slash commands, selection bubble menu and empty-block insert menu
+- full find/replace with case, whole-word and regular-expression options
+- draggable block handles on desktop
+- optional block IDs with copied `^block-id` references
+- images by HTTPS URL, YouTube embeds, sandboxed HTTPS web embeds and remote
+  HTTPS audio/video
+- DOMPurify-based sanitization for pasted rich HTML
+- word/character counts and mobile toolbar adaptations
+
+### Storage behavior
+
+Markdown-compatible content is serialized back to Markdown. Features that do not
+have a reliable standard Markdown representation (for example callouts, font
+styles, block IDs, rich embeds and some layout attributes) automatically use a
+reversible HTML fallback. The toolbar shows whether the current note is being
+stored as `Markdown` or `Rich HTML`.
+
+### Attachment limitation
+
+Modern Standard Notes encrypted Files are not currently exposed through
+`@standardnotes/editor-kit` to third-party iframe editors. This fork therefore
+does not pretend to upload local files through the deprecated FileSafe API.
+Images and media can be inserted from HTTPS URLs. Native encrypted attachment
+upload should only be added when Standard Notes exposes a supported Files bridge
+for third-party editors.
