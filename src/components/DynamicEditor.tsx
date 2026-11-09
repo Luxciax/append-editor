@@ -8,7 +8,7 @@ import React, {
 import debounce from 'lodash/debounce';
 import { EditorContent, useEditor } from '@tiptap/react';
 import { DragHandle } from '@tiptap/extension-drag-handle-react';
-import { BubbleMenu, FloatingMenu } from '@tiptap/react/menus';
+import { BubbleMenu } from '@tiptap/react/menus';
 import StarterKit from '@tiptap/starter-kit';
 import { Markdown } from '@tiptap/markdown';
 import { CharacterCount, Placeholder } from '@tiptap/extensions';
@@ -1147,60 +1147,6 @@ export default function DynamicEditor({
             </div>
           </BubbleMenu>
 
-          <FloatingMenu
-            editor={editor}
-            options={{ placement: 'left-start', offset: 8 }}
-            shouldShow={({ editor: currentEditor }) =>
-              !slashMenu.open &&
-              !findOpen &&
-              currentEditor.state.selection.empty
-            }
-          >
-            <div className="rich-context-menu insert-menu">
-              <span className="insert-menu-label" title="输入 / 查看全部插入命令">
-                +
-              </span>
-              <ToolbarButton
-                title="一级标题"
-                onClick={() =>
-                  editor.chain().focus().setHeading({ level: 1 }).run()
-                }
-              >
-                H1
-              </ToolbarButton>
-              <ToolbarButton
-                title="任务列表"
-                onClick={() => editor.chain().focus().toggleTaskList().run()}
-              >
-                ☑
-              </ToolbarButton>
-              <ToolbarButton title="公式" onClick={insertInlineMath}>
-                ∑
-              </ToolbarButton>
-              <ToolbarButton
-                title="提示块"
-                active={inCallout}
-                onClick={() => insertCallout('info')}
-              >
-                💡
-              </ToolbarButton>
-              <ToolbarButton title="图片" onClick={insertImage}>
-                Img
-              </ToolbarButton>
-              <ToolbarButton
-                title="表格"
-                onClick={() =>
-                  editor
-                    .chain()
-                    .focus()
-                    .insertTable({ rows: 3, cols: 3, withHeaderRow: true })
-                    .run()
-                }
-              >
-                Tbl
-              </ToolbarButton>
-            </div>
-          </FloatingMenu>
         </>
       )}
 
