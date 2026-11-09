@@ -8,11 +8,6 @@ interface ErrorBoundaryState {
   errorInfo?: ErrorInfo;
 }
 
-/**
- * Learn more about Error Boundaries here:
- * https://reactjs.org/docs/error-boundaries.html
- */
-
 export default class ErrorBoundary extends React.Component<
   any,
   ErrorBoundaryState
@@ -23,71 +18,53 @@ export default class ErrorBoundary extends React.Component<
   }
 
   static getDerivedStateFromError(error: Error) {
-    // Update state so the next render will show the fallback UI.
     return { hasError: true };
   }
 
   componentDidCatch(error: Error, errorInfo: ErrorInfo) {
-    // You can also log the error to an error reporting service
-    console.log('Error:', error, '\nError Info:', errorInfo);
-    this.setState({
-      error,
-      errorInfo,
-    });
+    console.log('编辑器错误:', error, '\n错误信息:', errorInfo);
+    this.setState({ error, errorInfo });
   }
 
   render() {
     if (this.state.hasError) {
-      // You can render any custom fallback UI
       return (
         <div className="sk-panel main">
           <div className="sk-panel-content view">
             <div id="errorBoundary">
-              <h1>Something went wrong.</h1>
+              <h1>编辑器运行出错</h1>
               <p>
-                Error Name: <code>{this.state.error?.name}</code>
+                错误类型：<code>{this.state.error?.name}</code>
               </p>
               <p>
-                Error Message: <code>{this.state.error?.message}</code>
+                错误信息：<code>{this.state.error?.message}</code>
               </p>
-              <p>Please see the developer console for details.</p>
-              <hr></hr>
+              <p>可以打开开发者控制台查看完整错误堆栈。</p>
+              <hr />
               <p>
-                Errors such as <code>TypeError</code> and{' '}
-                <code>Cannot read property 'type' of undefined</code> usually
-                occur when the editor is unable to process and render your notes
-                because it contains incorrect or incomplete HTML. If you are
-                writing in HTML, then please continue to write and refresh the
-                View Mode when the HTML tags are closed.
-              </p>
-              <p>
-                If you are using the Dynamic editing mode, then please switch to
-                the Plain Textarea or Monaco editing modes in the Settings
+                这通常不是笔记内容丢失，而是编辑器运行时、扩展节点或旧格式兼容出现问题。
+                你可以先打开
                 <button
                   className="inline-text-and-svg"
                   onClick={clickSettingsButton}
-                  title="Open Settings"
+                  title="打开设置"
                 >
                   <span>&nbsp;</span>
                   <GearIcon role="button" />
                   <span>&nbsp;</span>
                 </button>
-                and remove or fix the text that is causing the error.
+                ，切换到 Monaco 源码模式检查原始内容。
               </p>
               <p>
-                If the error persists or is not related to the content of your
-                note, then please{' '}
+                如果问题可以稳定复现，请在{' '}
                 <a
-                  href="https://github.com/TheodoreChu/append-editor/issues"
+                  href="https://github.com/Luxciax/append-editor/issues"
                   target="_blank"
                   rel="noopener noreferrer"
                 >
-                  report the issue on GitHub
+                  Luxciax/append-editor
                 </a>{' '}
-                and we will try to fix it.{' '}
-                <span role="img" aria-label="smile emoji">
-                  🙂
-                </span>
+                提交问题，并附上错误信息。
               </p>
             </div>
           </div>
