@@ -63,10 +63,10 @@ export default class Settings extends React.Component<
     if (this.props.monacoEditorLanguage) {
       monacoEditorLanguage = this.props.monacoEditorLanguage;
     }
-    let editingMode = EditingModes.useDynamicEditor;
-    if (this.props.editingMode) {
-      editingMode = this.props.editingMode;
-    }
+    const editingMode =
+      this.props.editingMode === EditingModes.useMonacoEditor
+        ? EditingModes.useMonacoEditor
+        : EditingModes.useDynamicEditor;
     this.state = {
       customStyles: this.props.customStyles,
       editingMode,
