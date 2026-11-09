@@ -5,7 +5,7 @@
   "area": "editor-editor",
   "version": "2.0.3",
   "description": "Notesnook-style rich Markdown editing for Standard Notes with live WYSIWYG, slash commands, tables, math, callouts, embeds, block drag handles, and Markdown-first storage.",
-  "url": "https://cdn.jsdelivr.net/gh/Luxciax/append-editor@gh-pages/index.html",
+  "url": "https://cdn.jsdelivr.net/gh/Luxciax/append-editor@0583da6f61d08c5c759aab8fa559af549ad4d70e/index.html",
   "download_url": "https://github.com/Luxciax/append-editor/releases/download/v2.0.3/append-editor-rich-v2.0.3.zip",
   "latest_url": "https://cdn.jsdelivr.net/gh/Luxciax/append-editor@main/public/append-editor-rich-v203.ext.json",
   "marketing_url": "https://github.com/Luxciax/append-editor",
