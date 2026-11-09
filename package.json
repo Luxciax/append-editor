@@ -1,7 +1,7 @@
 {
   "name": "append-editor",
-  "version": "1.2.6",
-  "description": "Append to your notes",
+  "version": "2.0.0",
+  "description": "Modern rich Markdown editor for Standard Notes based on Append Editor",
   "keywords": [
     "Append Editor",
     "Standard Notes",
@@ -9,7 +9,7 @@
     "KaTeX"
   ],
   "private": true,
-  "author": "Theodore Chu",
+  "author": "Theodore Chu and contributors; rich-editor fork maintained by Luxciax",
   "license": "AGPL-3.0-or-later",
   "repository": {
     "type": "git",
