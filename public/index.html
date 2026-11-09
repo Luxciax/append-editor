@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="zh-CN">
   <head>
     <meta charset="utf-8" />
     <link rel="icon" type="image/png" href="%PUBLIC_URL%/icon.png" />
@@ -30,11 +30,18 @@
       integrity="sha384-AfEj0r4/OFrOo5t7NnNe46zW/tFgW6x/bCJG8FqQCEo3+Aro6EYUG4+cU+KJWu/X"
       crossorigin="anonymous"
     />
-    <title>Append Editor</title>
+    <title>Append Editor Rich</title>
+    <script>
+      // Some browser-focused editor dependencies still probe Node's global
+      // process object at runtime. Standard Notes components run in a browser
+      // webview, so provide the minimal environment before the app bundle loads.
+      window.process = window.process || { env: { NODE_ENV: 'production' } };
+      window.process.env = window.process.env || { NODE_ENV: 'production' };
+    </script>
   </head>
 
   <body>
-    <noscript>You need to enable JavaScript to run this app.</noscript>
+    <noscript>需要启用 JavaScript 才能运行此编辑器。</noscript>
     <div id="root"></div>
     <!--
       This HTML file is a template.
