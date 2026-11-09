@@ -1,13 +1,13 @@
 {
-  "identifier": "com.append-editor.beta",
-  "name": "Append Editor - Beta",
+  "identifier": "com.luxciax.append-editor.rich",
+  "name": "Append Editor Rich",
   "content_type": "SN|Component",
   "area": "editor-editor",
-  "version": "1.2.6",
-  "description": "Append to your notes",
-  "url": "https://theodorechu.github.io/append-editor",
-  "download_url": "https://github.com/TheodoreChu/append-editor/releases/download/v1.2.6/append-editor-build-v1.2.6.zip",
-  "latest_url": "https://raw.githubusercontent.com/TheodoreChu/append-editor/main/public/beta.ext.json",
-  "marketing_url": "https://github.com/theodorechu/append-editor",
+  "version": "2.0.0",
+  "description": "Notesnook-style rich Markdown editing for Standard Notes with live WYSIWYG, slash commands, tables, math, callouts, embeds, block drag handles, and Markdown-first storage.",
+  "url": "https://luxciax.github.io/append-editor/",
+  "download_url": "https://github.com/Luxciax/append-editor/releases/download/v2.0.0/append-editor-rich-v2.0.0.zip",
+  "latest_url": "https://raw.githubusercontent.com/Luxciax/append-editor/main/public/beta.ext.json",
+  "marketing_url": "https://github.com/Luxciax/append-editor",
   "thumbnail_url": ""
 }
