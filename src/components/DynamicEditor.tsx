@@ -101,140 +101,140 @@ const CLOSED_SLASH_MENU: SlashMenuState = {
 const SLASH_COMMANDS: SlashCommandDefinition[] = [
   {
     id: 'paragraph',
-    label: 'Paragraph',
-    description: 'Plain text paragraph',
-    keywords: 'text normal paragraph',
+    label: '正文',
+    description: '普通正文段落',
+    keywords: '正文 段落 text normal paragraph',
   },
   {
     id: 'heading1',
-    label: 'Heading 1',
-    description: 'Large section heading',
-    keywords: 'h1 title heading',
+    label: '一级标题',
+    description: '一级大标题',
+    keywords: '一级标题 标题 h1 title heading',
   },
   {
     id: 'heading2',
-    label: 'Heading 2',
-    description: 'Medium section heading',
-    keywords: 'h2 subtitle heading',
+    label: '二级标题',
+    description: '二级标题',
+    keywords: '二级标题 标题 h2 subtitle heading',
   },
   {
     id: 'heading3',
-    label: 'Heading 3',
-    description: 'Small section heading',
-    keywords: 'h3 heading',
+    label: '三级标题',
+    description: '三级标题',
+    keywords: '三级标题 标题 h3 heading',
   },
   {
     id: 'bullet-list',
-    label: 'Bullet list',
-    description: 'Unordered list',
-    keywords: 'bullet list unordered',
+    label: '无序列表',
+    description: '项目符号列表',
+    keywords: '无序列表 项目符号 bullet list unordered',
   },
   {
     id: 'ordered-list',
-    label: 'Numbered list',
-    description: 'Ordered list',
-    keywords: 'ordered numbered list',
+    label: '有序列表',
+    description: '编号列表',
+    keywords: '有序列表 编号 ordered numbered list',
   },
   {
     id: 'outline-list',
-    label: 'Outline list',
-    description: 'Hierarchical outline numbering',
-    keywords: 'outline nested hierarchy numbered list',
+    label: '大纲列表',
+    description: '多级层次编号',
+    keywords: '大纲 层级 outline nested hierarchy numbered list',
   },
   {
     id: 'task-list',
-    label: 'Task list',
-    description: 'Interactive checklist',
-    keywords: 'task todo checkbox checklist',
+    label: '任务列表',
+    description: '可勾选任务清单',
+    keywords: '任务 待办 清单 task todo checkbox checklist',
   },
   {
     id: 'callout',
-    label: 'Callout',
-    description: 'Highlighted note block',
-    keywords: 'callout note info tip warning',
+    label: '提示块',
+    description: '醒目的提示/警告内容块',
+    keywords: '提示 信息 警告 callout note info tip warning',
   },
   {
     id: 'quote',
-    label: 'Quote',
-    description: 'Block quote',
+    label: '引用',
+    description: '引用块',
     keywords: 'blockquote quote',
   },
   {
     id: 'code-block',
-    label: 'Code block',
-    description: 'Preformatted code',
+    label: '代码块',
+    description: '预格式化代码',
     keywords: 'code preformatted',
   },
   {
     id: 'inline-math',
-    label: 'Inline formula',
-    description: 'KaTeX formula inside text',
+    label: '行内公式',
+    description: '正文中的 KaTeX 公式',
     keywords: 'math latex katex equation inline',
   },
   {
     id: 'block-math',
-    label: 'Formula block',
-    description: 'Centered KaTeX formula block',
+    label: '公式块',
+    description: '居中的 KaTeX 公式块',
     keywords: 'math latex katex equation block',
   },
   {
     id: 'table',
-    label: 'Table',
-    description: '3 x 3 table',
+    label: '表格',
+    description: '插入 3×3 表格',
     keywords: 'table grid',
   },
   {
     id: 'image',
-    label: 'Image',
-    description: 'Insert image from URL',
+    label: '图片',
+    description: '通过 URL 插入图片',
     keywords: 'image picture photo url',
   },
   {
     id: 'youtube',
     label: 'YouTube',
-    description: 'Embed a YouTube video',
+    description: '嵌入 YouTube 视频',
     keywords: 'youtube video embed media',
   },
   {
     id: 'web-embed',
-    label: 'Web embed',
-    description: 'Embed a sandboxed HTTPS page',
+    label: '网页嵌入',
+    description: '安全沙箱嵌入 HTTPS 网页',
     keywords: 'web iframe embed page media',
   },
   {
     id: 'audio',
-    label: 'Audio',
-    description: 'Embed remote HTTPS audio',
+    label: '音频',
+    description: '嵌入远程 HTTPS 音频',
     keywords: 'audio sound music media',
   },
   {
     id: 'video',
-    label: 'Video',
-    description: 'Embed remote HTTPS video',
+    label: '视频',
+    description: '嵌入远程 HTTPS 视频',
     keywords: 'video movie media',
   },
   {
     id: 'divider',
-    label: 'Divider',
-    description: 'Horizontal rule',
+    label: '分割线',
+    description: '水平分割线',
     keywords: 'divider separator horizontal rule',
   },
   {
     id: 'date',
-    label: 'Current date',
-    description: 'Insert the local date',
+    label: '当前日期',
+    description: '插入本地日期',
     keywords: 'date today calendar',
   },
   {
     id: 'time',
-    label: 'Current time',
-    description: 'Insert the local time',
+    label: '当前时间',
+    description: '插入本地时间',
     keywords: 'time clock now',
   },
   {
     id: 'date-time',
-    label: 'Date and time',
-    description: 'Insert local date and time',
+    label: '日期和时间',
+    description: '插入本地日期和时间',
     keywords: 'date time timestamp now',
   },
 ];
@@ -463,7 +463,7 @@ export default function DynamicEditor({
       Markdown,
       CharacterCount,
       Placeholder.configure({
-        placeholder: "Type '/' for commands, or start writing Markdown…",
+        placeholder: "直接开始输入，或输入 / 打开命令菜单…",
       }),
       Highlight.configure({ multicolor: true }),
       Image.configure({
@@ -646,7 +646,7 @@ export default function DynamicEditor({
         return;
       }
 
-      const latex = window.prompt('Edit LaTeX formula', node.attrs.latex || '');
+      const latex = window.prompt('编辑 LaTeX 公式', node.attrs.latex || '');
       if (latex === null || !latex.trim()) return;
 
       if (node.type.name === 'inlineMath') {
@@ -732,7 +732,7 @@ export default function DynamicEditor({
   }, [editor, slashMenu]);
 
   if (!editor) {
-    return <div className="DynamicEditor rich-editor-loading">Loading editor…</div>;
+    return <div className="DynamicEditor rich-editor-loading">编辑器加载中…</div>;
   }
 
   const toggleSourceMode = () => {
@@ -760,7 +760,7 @@ export default function DynamicEditor({
 
   const setLink = () => {
     const previous = editor.getAttributes('link').href || '';
-    const value = window.prompt('Link URL', previous);
+    const value = window.prompt('链接 URL', previous);
     if (value === null) return;
 
     const href = normalizeLink(value);
@@ -773,20 +773,20 @@ export default function DynamicEditor({
   };
 
   const insertImage = () => {
-    const value = window.prompt('Image URL (http/https)');
+    const value = window.prompt('图片 URL（http/https）');
     if (!value) return;
 
     if (!isRemoteImageUrl(value)) {
-      window.alert('Only http/https image URLs are supported for now.');
+      window.alert('目前仅支持 http/https 图片地址。');
       return;
     }
 
-    const alt = window.prompt('Alt text (optional)') || '';
+    const alt = window.prompt('图片说明（可选）') || '';
     editor.chain().focus().setImage({ src: value.trim(), alt }).run();
   };
 
   const insertYoutube = () => {
-    const value = window.prompt('YouTube URL');
+    const value = window.prompt('YouTube 视频 URL');
     if (!value?.trim()) return;
     const ok = editor
       .chain()
@@ -795,14 +795,14 @@ export default function DynamicEditor({
       .run();
 
     if (!ok) {
-      window.alert('That does not look like a supported YouTube URL.');
+      window.alert('这不是受支持的 YouTube 地址。');
     }
   };
 
   const insertWebEmbed = () => {
-    const value = window.prompt('HTTPS page URL');
+    const value = window.prompt('HTTPS 网页地址');
     if (!value?.trim()) return;
-    const title = window.prompt('Embed title (optional)') || 'Embedded content';
+    const title = window.prompt('嵌入标题（可选）') || '嵌入内容';
     const ok = editor
       .chain()
       .focus()
@@ -810,19 +810,19 @@ export default function DynamicEditor({
       .run();
 
     if (!ok) {
-      window.alert('Only valid HTTPS URLs can be embedded.');
+      window.alert('只能嵌入有效的 HTTPS 地址。');
     }
   };
 
   const insertMedia = (kind: MediaKind) => {
     const value = window.prompt(
-      kind === 'video' ? 'HTTPS video URL' : 'HTTPS audio URL'
+      kind === 'video' ? 'HTTPS 视频地址' : 'HTTPS 音频地址'
     );
     if (!value?.trim()) return;
 
     const title =
-      window.prompt(kind === 'video' ? 'Video title (optional)' : 'Audio title (optional)') ||
-      (kind === 'video' ? 'Video' : 'Audio');
+      window.prompt(kind === 'video' ? '视频标题（可选）' : '音频标题（可选）') ||
+      (kind === 'video' ? '视频' : '音频');
 
     const ok = editor
       .chain()
@@ -831,18 +831,18 @@ export default function DynamicEditor({
       .run();
 
     if (!ok) {
-      window.alert('Only valid HTTPS media URLs can be embedded.');
+      window.alert('只能嵌入有效的 HTTPS 媒体地址。');
     }
   };
 
   const insertInlineMath = () => {
-    const latex = window.prompt('Inline LaTeX formula', 'E = mc^2');
+    const latex = window.prompt('行内 LaTeX 公式', 'E = mc^2');
     if (!latex?.trim()) return;
     editor.chain().focus().insertInlineMath({ latex: latex.trim() }).run();
   };
 
   const insertBlockMath = () => {
-    const latex = window.prompt('Block LaTeX formula', '\\frac{a}{b}');
+    const latex = window.prompt('块级 LaTeX 公式', '\\frac{a}{b}');
     if (!latex?.trim()) return;
     editor.chain().focus().insertBlockMath({ latex: latex.trim() }).run();
   };
@@ -889,13 +889,13 @@ export default function DynamicEditor({
   const assignBlockId = async () => {
     const selected = getSelectedBlock();
     if (!selected) {
-      window.alert('Place the cursor inside a supported block first.');
+      window.alert('请先把光标放到支持块 ID 的内容块中。');
       return;
     }
 
     const current = selected.blockId || '';
     const requested = window.prompt(
-      'Block ID (leave empty to generate one)',
+      '块 ID（留空则自动生成）',
       current
     );
 
@@ -1101,35 +1101,35 @@ export default function DynamicEditor({
           >
             <div className="rich-context-menu selection-menu">
               <ToolbarButton
-                title="Bold"
+                title="加粗"
                 active={editor.isActive('bold')}
                 onClick={() => editor.chain().focus().toggleBold().run()}
               >
                 <strong>B</strong>
               </ToolbarButton>
               <ToolbarButton
-                title="Italic"
+                title="斜体"
                 active={editor.isActive('italic')}
                 onClick={() => editor.chain().focus().toggleItalic().run()}
               >
                 <em>I</em>
               </ToolbarButton>
               <ToolbarButton
-                title="Underline"
+                title="下划线"
                 active={editor.isActive('underline')}
                 onClick={() => editor.chain().focus().toggleUnderline().run()}
               >
                 <u>U</u>
               </ToolbarButton>
               <ToolbarButton
-                title="Strikethrough"
+                title="删除线"
                 active={editor.isActive('strike')}
                 onClick={() => editor.chain().focus().toggleStrike().run()}
               >
                 <s>S</s>
               </ToolbarButton>
               <ToolbarButton
-                title="Highlight"
+                title="高亮"
                 active={editor.isActive('highlight')}
                 onClick={() =>
                   editor.chain().focus().toggleHighlight({ color: '#fff59d' }).run()
@@ -1138,7 +1138,7 @@ export default function DynamicEditor({
                 H
               </ToolbarButton>
               <ToolbarButton
-                title="Link"
+                title="链接"
                 active={editor.isActive('link')}
                 onClick={setLink}
               >
@@ -1157,11 +1157,11 @@ export default function DynamicEditor({
             }
           >
             <div className="rich-context-menu insert-menu">
-              <span className="insert-menu-label" title="Type / for all commands">
+              <span className="insert-menu-label" title="输入 / 查看全部插入命令">
                 +
               </span>
               <ToolbarButton
-                title="Heading 1"
+                title="一级标题"
                 onClick={() =>
                   editor.chain().focus().setHeading({ level: 1 }).run()
                 }
@@ -1169,26 +1169,26 @@ export default function DynamicEditor({
                 H1
               </ToolbarButton>
               <ToolbarButton
-                title="Task list"
+                title="任务列表"
                 onClick={() => editor.chain().focus().toggleTaskList().run()}
               >
                 ☑
               </ToolbarButton>
-              <ToolbarButton title="Formula" onClick={insertInlineMath}>
+              <ToolbarButton title="公式" onClick={insertInlineMath}>
                 ∑
               </ToolbarButton>
               <ToolbarButton
-                title="Callout"
+                title="提示块"
                 active={inCallout}
                 onClick={() => insertCallout('info')}
               >
                 💡
               </ToolbarButton>
-              <ToolbarButton title="Image" onClick={insertImage}>
+              <ToolbarButton title="图片" onClick={insertImage}>
                 Img
               </ToolbarButton>
               <ToolbarButton
-                title="Table"
+                title="表格"
                 onClick={() =>
                   editor
                     .chain()
@@ -1204,12 +1204,12 @@ export default function DynamicEditor({
         </>
       )}
 
-      <div className="rich-toolbar" role="toolbar" aria-label="Formatting toolbar">
+      <div className="rich-toolbar" role="toolbar" aria-label="格式工具栏">
         <div className="rich-toolbar-group">
           <select
             className="rich-toolbar-select"
-            aria-label="Text style"
-            title="Text style"
+            aria-label="文本样式"
+            title="文本样式"
             disabled={sourceMode || readOnly}
             value={currentHeading ? `h${currentHeading}` : 'paragraph'}
             onChange={(event) => {
@@ -1228,19 +1228,19 @@ export default function DynamicEditor({
               }
             }}
           >
-            <option value="paragraph">Paragraph</option>
-            <option value="h1">Heading 1</option>
-            <option value="h2">Heading 2</option>
-            <option value="h3">Heading 3</option>
-            <option value="h4">Heading 4</option>
-            <option value="h5">Heading 5</option>
-            <option value="h6">Heading 6</option>
+            <option value="paragraph">正文</option>
+            <option value="h1">一级标题</option>
+            <option value="h2">二级标题</option>
+            <option value="h3">三级标题</option>
+            <option value="h4">四级标题</option>
+            <option value="h5">五级标题</option>
+            <option value="h6">六级标题</option>
           </select>
 
           <select
             className="rich-toolbar-select"
-            aria-label="Font family"
-            title="Font family"
+            aria-label="字体"
+            title="字体"
             disabled={sourceMode || readOnly}
             value={activeFontFamily}
             onChange={(event) => {
@@ -1252,20 +1252,20 @@ export default function DynamicEditor({
               }
             }}
           >
-            <option value="">Font</option>
+            <option value="">字体</option>
             <option value="Arial">Arial</option>
             <option value="Georgia">Georgia</option>
             <option value="'Times New Roman'">Times New Roman</option>
             <option value="Verdana">Verdana</option>
             <option value="Tahoma">Tahoma</option>
             <option value="'Courier New'">Courier New</option>
-            <option value="monospace">Monospace</option>
+            <option value="monospace">等宽字体</option>
           </select>
 
           <select
             className="rich-toolbar-select compact"
-            aria-label="Font size"
-            title="Font size"
+            aria-label="字号"
+            title="字号"
             disabled={sourceMode || readOnly}
             defaultValue=""
             onChange={(event) => {
@@ -1277,7 +1277,7 @@ export default function DynamicEditor({
               }
             }}
           >
-            <option value="">Size</option>
+            <option value="">字号</option>
             <option value="12px">12</option>
             <option value="14px">14</option>
             <option value="16px">16</option>
@@ -1289,8 +1289,8 @@ export default function DynamicEditor({
 
           <select
             className="rich-toolbar-select compact"
-            aria-label="Line height"
-            title="Line height"
+            aria-label="行高"
+            title="行高"
             disabled={sourceMode || readOnly}
             value={activeLineHeight}
             onChange={(event) => {
@@ -1302,7 +1302,7 @@ export default function DynamicEditor({
               }
             }}
           >
-            <option value="">Line</option>
+            <option value="">行高</option>
             <option value="1">1.0</option>
             <option value="1.25">1.25</option>
             <option value="1.5">1.5</option>
@@ -1313,7 +1313,7 @@ export default function DynamicEditor({
 
         <div className="rich-toolbar-group">
           <ToolbarButton
-            title="Bold"
+            title="加粗"
             active={editor.isActive('bold')}
             disabled={sourceMode || readOnly}
             onClick={() => editor.chain().focus().toggleBold().run()}
@@ -1321,7 +1321,7 @@ export default function DynamicEditor({
             <strong>B</strong>
           </ToolbarButton>
           <ToolbarButton
-            title="Italic"
+            title="斜体"
             active={editor.isActive('italic')}
             disabled={sourceMode || readOnly}
             onClick={() => editor.chain().focus().toggleItalic().run()}
@@ -1329,7 +1329,7 @@ export default function DynamicEditor({
             <em>I</em>
           </ToolbarButton>
           <ToolbarButton
-            title="Underline"
+            title="下划线"
             active={editor.isActive('underline')}
             disabled={sourceMode || readOnly}
             onClick={() => editor.chain().focus().toggleUnderline().run()}
@@ -1337,7 +1337,7 @@ export default function DynamicEditor({
             <u>U</u>
           </ToolbarButton>
           <ToolbarButton
-            title="Strikethrough"
+            title="删除线"
             active={editor.isActive('strike')}
             disabled={sourceMode || readOnly}
             onClick={() => editor.chain().focus().toggleStrike().run()}
@@ -1345,7 +1345,7 @@ export default function DynamicEditor({
             <s>S</s>
           </ToolbarButton>
           <ToolbarButton
-            title="Inline code"
+            title="行内代码"
             active={editor.isActive('code')}
             disabled={sourceMode || readOnly}
             onClick={() => editor.chain().focus().toggleCode().run()}
@@ -1353,7 +1353,7 @@ export default function DynamicEditor({
             {'</>'}
           </ToolbarButton>
           <ToolbarButton
-            title="Subscript"
+            title="下标"
             active={editor.isActive('subscript')}
             disabled={sourceMode || readOnly}
             onClick={() => editor.chain().focus().toggleSubscript().run()}
@@ -1361,7 +1361,7 @@ export default function DynamicEditor({
             X₂
           </ToolbarButton>
           <ToolbarButton
-            title="Superscript"
+            title="上标"
             active={editor.isActive('superscript')}
             disabled={sourceMode || readOnly}
             onClick={() => editor.chain().focus().toggleSuperscript().run()}
@@ -1371,22 +1371,22 @@ export default function DynamicEditor({
         </div>
 
         <div className="rich-toolbar-group">
-          <label className="rich-color-control" title="Text color">
+          <label className="rich-color-control" title="文字颜色">
             A
             <input
               type="color"
-              aria-label="Text color"
+              aria-label="文字颜色"
               disabled={sourceMode || readOnly}
               onChange={(event) =>
                 editor.chain().focus().setColor(event.target.value).run()
               }
             />
           </label>
-          <label className="rich-color-control highlight" title="Highlight color">
+          <label className="rich-color-control highlight" title="高亮颜色">
             H
             <input
               type="color"
-              aria-label="Highlight color"
+              aria-label="高亮颜色"
               disabled={sourceMode || readOnly}
               defaultValue="#fff59d"
               onChange={(event) =>
@@ -1399,7 +1399,7 @@ export default function DynamicEditor({
             />
           </label>
           <ToolbarButton
-            title="Remove inline formatting"
+            title="清除格式"
             disabled={sourceMode || readOnly}
             onClick={() =>
               editor.chain().focus().unsetAllMarks().clearNodes().run()
@@ -1411,7 +1411,7 @@ export default function DynamicEditor({
 
         <div className="rich-toolbar-group">
           <ToolbarButton
-            title="Bullet list"
+            title="无序列表"
             active={editor.isActive('bulletList')}
             disabled={sourceMode || readOnly}
             onClick={() => editor.chain().focus().toggleBulletList().run()}
@@ -1419,7 +1419,7 @@ export default function DynamicEditor({
             • List
           </ToolbarButton>
           <ToolbarButton
-            title="Numbered list"
+            title="有序列表"
             active={editor.isActive('orderedList')}
             disabled={sourceMode || readOnly}
             onClick={() => editor.chain().focus().toggleOrderedList().run()}
@@ -1427,7 +1427,7 @@ export default function DynamicEditor({
             1. List
           </ToolbarButton>
           <ToolbarButton
-            title="Task list"
+            title="任务列表"
             active={editor.isActive('taskList')}
             disabled={sourceMode || readOnly}
             onClick={() => editor.chain().focus().toggleTaskList().run()}
@@ -1435,7 +1435,7 @@ export default function DynamicEditor({
             ☑
           </ToolbarButton>
           <ToolbarButton
-            title="Callout"
+            title="提示块"
             active={inCallout}
             disabled={sourceMode || readOnly}
             onClick={() => insertCallout('info')}
@@ -1443,7 +1443,7 @@ export default function DynamicEditor({
             💡
           </ToolbarButton>
           <ToolbarButton
-            title="Blockquote"
+            title="引用"
             active={editor.isActive('blockquote')}
             disabled={sourceMode || readOnly}
             onClick={() => editor.chain().focus().toggleBlockquote().run()}
@@ -1451,7 +1451,7 @@ export default function DynamicEditor({
             “ ”
           </ToolbarButton>
           <ToolbarButton
-            title="Code block"
+            title="代码块"
             active={editor.isActive('codeBlock')}
             disabled={sourceMode || readOnly}
             onClick={() => editor.chain().focus().toggleCodeBlock().run()}
@@ -1459,7 +1459,7 @@ export default function DynamicEditor({
             Code
           </ToolbarButton>
           <ToolbarButton
-            title="Horizontal rule"
+            title="分割线"
             disabled={sourceMode || readOnly}
             onClick={() => editor.chain().focus().setHorizontalRule().run()}
           >
@@ -1471,8 +1471,8 @@ export default function DynamicEditor({
           <div className="rich-toolbar-group callout-tools">
             <select
               className="rich-toolbar-select"
-              aria-label="Callout type"
-              title="Callout type"
+              aria-label="提示块类型"
+              title="提示块类型"
               value={activeCalloutType}
               disabled={readOnly}
               onChange={(event) =>
@@ -1483,13 +1483,13 @@ export default function DynamicEditor({
                   .run()
               }
             >
-              <option value="info">Info</option>
-              <option value="tip">Tip</option>
-              <option value="warning">Warning</option>
-              <option value="danger">Danger</option>
+              <option value="info">信息</option>
+              <option value="tip">提示</option>
+              <option value="warning">警告</option>
+              <option value="danger">危险</option>
             </select>
             <ToolbarButton
-              title="Remove callout"
+              title="移除提示块"
               disabled={readOnly}
               onClick={() => editor.chain().focus().unsetCallout().run()}
             >
@@ -1520,8 +1520,8 @@ export default function DynamicEditor({
           ))}
           <select
             className="rich-toolbar-select compact"
-            aria-label="Text direction"
-            title="Text direction"
+            aria-label="文字方向"
+            title="文字方向"
             disabled={sourceMode || readOnly}
             value={activeDirection}
             onChange={(event) => {
@@ -1537,8 +1537,8 @@ export default function DynamicEditor({
               }
             }}
           >
-            <option value="">Dir</option>
-            <option value="auto">Auto</option>
+            <option value="">方向</option>
+            <option value="auto">自动</option>
             <option value="ltr">LTR</option>
             <option value="rtl">RTL</option>
           </select>
@@ -1546,7 +1546,7 @@ export default function DynamicEditor({
 
         <div className="rich-toolbar-group">
           <ToolbarButton
-            title="Add or edit link"
+            title="添加或编辑链接"
             active={editor.isActive('link')}
             disabled={sourceMode || readOnly}
             onClick={setLink}
@@ -1554,56 +1554,56 @@ export default function DynamicEditor({
             Link
           </ToolbarButton>
           <ToolbarButton
-            title="Insert image by URL"
+            title="通过 URL 插入图片"
             disabled={sourceMode || readOnly}
             onClick={insertImage}
           >
             Image
           </ToolbarButton>
           <ToolbarButton
-            title="Insert YouTube video"
+            title="插入 YouTube 视频"
             disabled={sourceMode || readOnly}
             onClick={insertYoutube}
           >
             YouTube
           </ToolbarButton>
           <ToolbarButton
-            title="Insert sandboxed web embed"
+            title="插入安全网页嵌入"
             disabled={sourceMode || readOnly}
             onClick={insertWebEmbed}
           >
             Embed
           </ToolbarButton>
           <ToolbarButton
-            title="Insert remote audio"
+            title="插入远程音频"
             disabled={sourceMode || readOnly}
             onClick={() => insertMedia('audio')}
           >
             Audio
           </ToolbarButton>
           <ToolbarButton
-            title="Insert remote video"
+            title="插入远程视频"
             disabled={sourceMode || readOnly}
             onClick={() => insertMedia('video')}
           >
             Video
           </ToolbarButton>
           <ToolbarButton
-            title="Insert inline formula"
+            title="插入行内公式"
             disabled={sourceMode || readOnly}
             onClick={insertInlineMath}
           >
             ∑
           </ToolbarButton>
           <ToolbarButton
-            title="Insert block formula"
+            title="插入块级公式"
             disabled={sourceMode || readOnly}
             onClick={insertBlockMath}
           >
             ∫
           </ToolbarButton>
           <ToolbarButton
-            title="Insert table"
+            title="插入表格"
             disabled={sourceMode || readOnly}
             onClick={() =>
               editor
@@ -1621,8 +1621,8 @@ export default function DynamicEditor({
           <div className="rich-toolbar-group code-tools">
             <select
               className="rich-toolbar-select"
-              aria-label="Code language"
-              title="Code language"
+              aria-label="代码语言"
+              title="代码语言"
               value={activeCodeLanguage}
               disabled={readOnly}
               onChange={(event) =>
@@ -1635,7 +1635,7 @@ export default function DynamicEditor({
                   .run()
               }
             >
-              <option value="">Plain code</option>
+              <option value="">纯文本代码</option>
               <option value="bash">Bash</option>
               <option value="css">CSS</option>
               <option value="html">HTML</option>
@@ -1653,56 +1653,56 @@ export default function DynamicEditor({
         {inTable && !sourceMode && (
           <div className="rich-toolbar-group table-tools">
             <ToolbarButton
-              title="Add row"
+              title="新增行"
               disabled={readOnly}
               onClick={() => editor.chain().focus().addRowAfter().run()}
             >
               Row+
             </ToolbarButton>
             <ToolbarButton
-              title="Delete row"
+              title="删除行"
               disabled={readOnly}
               onClick={() => editor.chain().focus().deleteRow().run()}
             >
               Row−
             </ToolbarButton>
             <ToolbarButton
-              title="Add column"
+              title="新增列"
               disabled={readOnly}
               onClick={() => editor.chain().focus().addColumnAfter().run()}
             >
               Col+
             </ToolbarButton>
             <ToolbarButton
-              title="Delete column"
+              title="删除列"
               disabled={readOnly}
               onClick={() => editor.chain().focus().deleteColumn().run()}
             >
               Col−
             </ToolbarButton>
             <ToolbarButton
-              title="Toggle header row"
+              title="切换表头行"
               disabled={readOnly}
               onClick={() => editor.chain().focus().toggleHeaderRow().run()}
             >
               Header
             </ToolbarButton>
             <ToolbarButton
-              title="Merge selected cells"
+              title="合并选中单元格"
               disabled={readOnly || !editor.can().mergeCells()}
               onClick={() => editor.chain().focus().mergeCells().run()}
             >
               Merge
             </ToolbarButton>
             <ToolbarButton
-              title="Split selected cell"
+              title="拆分单元格"
               disabled={readOnly || !editor.can().splitCell()}
               onClick={() => editor.chain().focus().splitCell().run()}
             >
               Split
             </ToolbarButton>
             <ToolbarButton
-              title="Delete table"
+              title="删除表格"
               disabled={readOnly}
               onClick={() => editor.chain().focus().deleteTable().run()}
             >
@@ -1713,7 +1713,7 @@ export default function DynamicEditor({
 
         <div className="rich-toolbar-group block-tools">
           <ToolbarButton
-            title="Toggle outline list"
+            title="切换大纲列表"
             active={editor.isActive('outlineList')}
             disabled={sourceMode || readOnly}
             onClick={() => editor.chain().focus().toggleOutlineList().run()}
@@ -1721,14 +1721,14 @@ export default function DynamicEditor({
             Outline
           </ToolbarButton>
           <ToolbarButton
-            title="Set/generate block ID and copy reference"
+            title="设置/生成块 ID 并复制引用"
             disabled={sourceMode || readOnly}
             onClick={assignBlockId}
           >
             Block ID
           </ToolbarButton>
           <ToolbarButton
-            title="Remove block ID"
+            title="移除块 ID"
             disabled={sourceMode || readOnly || !getSelectedBlock()?.blockId}
             onClick={clearBlockId}
           >
@@ -1748,7 +1748,7 @@ export default function DynamicEditor({
             {richStorage ? 'Rich HTML' : 'Markdown'}
           </span>
           <ToolbarButton
-            title="Find and replace (Ctrl/Cmd+F)"
+            title="查找替换（Ctrl/Cmd+F）"
             active={findOpen}
             disabled={sourceMode}
             onClick={() => setFindOpen((value) => !value)}
@@ -1756,7 +1756,7 @@ export default function DynamicEditor({
             Find
           </ToolbarButton>
           <ToolbarButton
-            title="Undo"
+            title="撤销"
             disabled={
               sourceMode || readOnly || !editor.can().chain().focus().undo().run()
             }
@@ -1765,7 +1765,7 @@ export default function DynamicEditor({
             ↶
           </ToolbarButton>
           <ToolbarButton
-            title="Redo"
+            title="重做"
             disabled={
               sourceMode || readOnly || !editor.can().chain().focus().redo().run()
             }
@@ -1774,7 +1774,7 @@ export default function DynamicEditor({
             ↷
           </ToolbarButton>
           <ToolbarButton
-            title={sourceMode ? 'Return to rich editor' : 'Edit source'}
+            title={sourceMode ? '返回富文本编辑' : '编辑源码'}
             active={sourceMode}
             disabled={readOnly}
             onClick={toggleSourceMode}
@@ -1785,15 +1785,15 @@ export default function DynamicEditor({
       </div>
 
       {findOpen && !sourceMode && (
-        <div className="find-replace-panel" role="search" aria-label="Find and replace">
+        <div className="find-replace-panel" role="search" aria-label="查找替换">
           <div className="find-replace-row">
             <input
               ref={searchInputRef}
               className="find-replace-input"
               type="text"
               value={searchTerm}
-              placeholder="Find"
-              aria-label="Find"
+              placeholder="查找"
+              aria-label="查找"
               onChange={(event) => updateSearchTerm(event.target.value)}
               onKeyDown={(event) => {
                 if (event.key === 'Enter') {
@@ -1816,7 +1816,7 @@ export default function DynamicEditor({
               className="find-replace-button"
               disabled={!resultCount}
               onClick={() => editor.commands.goToPreviousResult()}
-              title="Previous result"
+              title="上一个结果"
             >
               ↑
             </button>
@@ -1825,7 +1825,7 @@ export default function DynamicEditor({
               className="find-replace-button"
               disabled={!resultCount}
               onClick={() => editor.commands.goToNextResult()}
-              title="Next result"
+              title="下一个结果"
             >
               ↓
             </button>
@@ -1833,7 +1833,7 @@ export default function DynamicEditor({
               type="button"
               className="find-replace-button"
               onClick={() => setFindOpen(false)}
-              title="Close find and replace"
+              title="关闭查找替换"
             >
               ×
             </button>
@@ -1843,8 +1843,8 @@ export default function DynamicEditor({
               className="find-replace-input"
               type="text"
               value={replaceTerm}
-              placeholder="Replace with"
-              aria-label="Replace with"
+              placeholder="替换为"
+              aria-label="替换为"
               disabled={readOnly}
               onChange={(event) => updateReplaceTerm(event.target.value)}
               onKeyDown={(event) => {
@@ -1905,7 +1905,7 @@ export default function DynamicEditor({
         <div
           className="slash-command-menu"
           role="listbox"
-          aria-label="Insert block"
+          aria-label="插入内容块"
           style={{ left: slashMenu.x, top: slashMenu.y }}
         >
           <div className="slash-command-header">
@@ -1937,7 +1937,7 @@ export default function DynamicEditor({
               </button>
             ))
           ) : (
-            <div className="slash-command-empty">No matching commands</div>
+            <div className="slash-command-empty">没有匹配的命令</div>
           )}
         </div>
       )}
@@ -1945,7 +1945,7 @@ export default function DynamicEditor({
       {sourceMode ? (
         <textarea
           className="rich-source-editor"
-          aria-label="Note source"
+          aria-label="笔记源码"
           spellCheck={false}
           value={sourceText}
           onChange={(event) => {
@@ -1965,8 +1965,8 @@ export default function DynamicEditor({
               <button
                 type="button"
                 className="append-block-drag-button"
-                title="Drag block"
-                aria-label="Drag block"
+                title="拖动内容块"
+                aria-label="拖动内容块"
               >
                 ⋮⋮
               </button>
@@ -1979,9 +1979,9 @@ export default function DynamicEditor({
       {!sourceMode && (
         <div className="rich-editor-status">
           <span>{wordCount} words · {characterCount} characters</span>
-          <span>Type / for insert commands</span>
-          <span>Double-click a formula to edit LaTeX</span>
-          <span>Ctrl/Cmd+F to search</span>
+          <span>输入 / 打开插入命令</span>
+          <span>双击公式可编辑 LaTeX</span>
+          <span>Ctrl/Cmd+F 查找</span>
         </div>
       )}
     </div>
