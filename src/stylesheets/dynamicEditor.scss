@@ -629,3 +629,109 @@
   border-radius: 5px;
   padding-left: 4px;
 }
+
+
+.append-block-drag-handle {
+  z-index: 55;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.append-block-drag-button {
+  width: 26px;
+  height: 30px;
+  padding: 0;
+  border: 1px solid var(--sn-stylekit-border-color);
+  border-radius: 5px;
+  background: var(--sn-stylekit-background-color);
+  color: var(--sn-stylekit-neutral-color);
+  font-size: 15px;
+  letter-spacing: -3px;
+  cursor: grab;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+}
+
+.append-block-drag-button:active {
+  cursor: grabbing;
+}
+
+.append-rich-editor .outline-list {
+  counter-reset: outline-item;
+  list-style: none;
+  padding-left: 1.6em;
+}
+
+.append-rich-editor .outline-list > li {
+  counter-increment: outline-item;
+  position: relative;
+}
+
+.append-rich-editor .outline-list > li::before {
+  content: counters(outline-item, '.') '.';
+  position: absolute;
+  right: calc(100% + 0.45em);
+  color: var(--sn-stylekit-neutral-color);
+  font-variant-numeric: tabular-nums;
+}
+
+.append-rich-editor .outline-list .outline-list {
+  counter-reset: outline-item;
+}
+
+.append-rich-editor div[data-youtube-video],
+.append-rich-editor div[data-web-embed] {
+  width: 100%;
+  margin: 1em 0;
+  overflow: hidden;
+  border: 1px solid var(--sn-stylekit-border-color);
+  border-radius: 8px;
+  background: var(--sn-stylekit-contrast-background-color);
+}
+
+.append-rich-editor div[data-youtube-video] iframe,
+.append-rich-editor div[data-web-embed] iframe {
+  display: block;
+  width: 100%;
+  min-height: 320px;
+  border: 0;
+  background: #000;
+}
+
+.append-rich-editor div[data-web-embed] iframe {
+  min-height: 420px;
+  background: var(--sn-stylekit-background-color);
+}
+
+.append-rich-editor [data-block-id] {
+  position: relative;
+}
+
+.append-rich-editor [data-block-id]::after {
+  content: '^' attr(data-block-id);
+  display: inline-block;
+  margin-left: 0.5em;
+  color: var(--sn-stylekit-neutral-color);
+  font-size: 10px;
+  font-family: var(--sn-stylekit-monospace-font);
+  opacity: 0.6;
+}
+
+.block-tools .rich-toolbar-button {
+  white-space: nowrap;
+}
+
+@media screen and (max-width: 650px) {
+  .append-block-drag-handle {
+    display: none !important;
+  }
+
+  .append-rich-editor div[data-youtube-video] iframe,
+  .append-rich-editor div[data-web-embed] iframe {
+    min-height: 220px;
+  }
+
+  .append-rich-editor [data-block-id]::after {
+    display: none;
+  }
+}
