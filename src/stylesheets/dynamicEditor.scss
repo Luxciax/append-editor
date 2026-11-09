@@ -735,3 +735,18 @@
     display: none;
   }
 }
+
+
+.append-rich-editor audio[data-rich-media],
+.append-rich-editor video[data-rich-media] {
+  display: block;
+  width: 100%;
+  max-width: 100%;
+  margin: 1em 0;
+  border-radius: 8px;
+  background: var(--sn-stylekit-contrast-background-color);
+}
+
+.append-rich-editor video[data-rich-media] {
+  max-height: 70vh;
+}
