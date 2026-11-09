@@ -1,5 +1,5 @@
 name: temporary-rich-editor-build-check
-# final advanced editor validation
+# syntax bundle optimization validation
 
 permissions:
   contents: write
