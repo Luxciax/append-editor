@@ -1097,7 +1097,12 @@ export default function DynamicEditor({
           <BubbleMenu
             editor={editor}
             options={{ placement: 'top', offset: 8 }}
-            shouldShow={({ from, to }) => from !== to && !findOpen}
+            shouldShow={({ from, to }) =>
+              from !== to &&
+              !findOpen &&
+              !window.matchMedia('(pointer: coarse)').matches &&
+              window.innerWidth > 700
+            }
           >
             <div className="rich-context-menu selection-menu">
               <ToolbarButton
