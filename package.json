@@ -9,6 +9,7 @@
     "KaTeX"
   ],
   "private": true,
+  "packageManager": "yarn@1.22.22",
   "author": "Theodore Chu and contributors; rich-editor fork maintained by Luxciax",
   "license": "AGPL-3.0-or-later",
   "repository": {
