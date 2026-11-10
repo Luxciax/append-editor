@@ -834,3 +834,97 @@ button:focus {
 @import './dynamicEditor.scss';
 @import './print.scss';
 @import './dark.scss';
+
+
+/* Android Standard Notes WebView */
+@media screen and (max-width: 700px), (pointer: coarse) {
+  html,
+  body {
+    width: 100%;
+    min-width: 0;
+    min-height: 100dvh;
+    overflow-x: hidden;
+  }
+
+  .sn-component {
+    width: 100%;
+    min-width: 0;
+    min-height: 100dvh;
+  }
+
+  #header {
+    width: 100%;
+    min-height: 48px;
+    box-sizing: border-box;
+    overflow-x: auto;
+    overflow-y: hidden;
+    padding: 4px 0;
+    scrollbar-width: none;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  #header::-webkit-scrollbar {
+    display: none;
+  }
+
+  #header .sk-button-group {
+    width: max-content;
+    min-width: max-content;
+    max-width: none;
+    flex: 0 0 auto;
+    flex-wrap: nowrap;
+    margin: 0;
+    padding: 0 6px;
+  }
+
+  #header button {
+    min-width: 44px;
+    min-height: 44px;
+    flex: 0 0 auto;
+    touch-action: manipulation;
+  }
+
+  #content {
+    width: 100%;
+    min-width: 0;
+    min-height: calc(100dvh - 52px);
+    box-sizing: border-box;
+    overflow-x: hidden;
+    justify-content: stretch;
+  }
+
+  #content.fixed-header {
+    padding-top: 52px;
+  }
+
+  #content.edit-only,
+  #content.fixed-height {
+    max-height: none;
+    min-height: calc(100dvh - 52px);
+  }
+
+  .sn-component .sk-panel.main {
+    width: 100%;
+    max-width: none;
+    min-width: 0;
+    box-sizing: border-box;
+    margin: 0;
+  }
+
+  #menu {
+    top: 0;
+    right: 0;
+    width: min(92vw, 390px);
+    min-width: 0;
+    max-width: 92vw;
+    height: 100dvh;
+    max-height: 100dvh;
+    padding-bottom: env(safe-area-inset-bottom);
+    box-sizing: border-box;
+  }
+
+  .menu-overlay {
+    top: 0;
+    height: 100dvh;
+  }
+}
