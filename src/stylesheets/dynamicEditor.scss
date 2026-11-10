@@ -780,3 +780,271 @@
 .selection-menu .rich-toolbar-button {
   flex: 0 0 auto;
 }
+
+
+/* Android / touch WebView layout */
+@media screen and (max-width: 700px), (pointer: coarse) {
+  .DynamicEditor {
+    width: 100%;
+    min-width: 0;
+    min-height: 100dvh;
+    overflow-x: hidden;
+  }
+
+  .rich-toolbar {
+    position: sticky;
+    top: 0;
+    z-index: 40;
+    display: flex;
+    width: 100%;
+    height: 50px;
+    min-height: 50px;
+    box-sizing: border-box;
+    flex-wrap: nowrap;
+    align-items: center;
+    justify-content: flex-start;
+    gap: 4px;
+    overflow-x: auto;
+    overflow-y: hidden;
+    padding: 4px 6px;
+    overscroll-behavior-x: contain;
+    scroll-behavior: smooth;
+    scrollbar-width: none;
+    -webkit-overflow-scrolling: touch;
+    touch-action: pan-x;
+  }
+
+  .rich-toolbar::-webkit-scrollbar {
+    display: none;
+  }
+
+  .rich-toolbar-group {
+    display: inline-flex;
+    flex: 0 0 auto;
+    min-width: max-content;
+    max-width: none;
+    flex-wrap: nowrap;
+    align-items: center;
+    gap: 3px;
+    padding-right: 5px;
+  }
+
+  .rich-toolbar-button,
+  .rich-toolbar-select,
+  .rich-color-control,
+  .find-replace-button {
+    min-width: 44px;
+    min-height: 42px;
+    height: 42px;
+    box-sizing: border-box;
+    flex: 0 0 auto;
+    font-size: 15px;
+    line-height: 1.2;
+    touch-action: manipulation;
+  }
+
+  .rich-toolbar-button {
+    padding: 6px 9px;
+  }
+
+  .rich-toolbar-select {
+    width: auto;
+    min-width: 92px;
+    max-width: 148px;
+    padding: 5px 8px;
+  }
+
+  .rich-toolbar-select.compact {
+    min-width: 72px;
+    max-width: 96px;
+  }
+
+  .rich-color-control {
+    padding: 5px 8px;
+  }
+
+  .rich-storage-badge {
+    min-height: 30px;
+    flex: 0 0 auto;
+  }
+
+  .append-rich-editor {
+    width: 100%;
+    min-height: calc(100dvh - 50px);
+    box-sizing: border-box;
+    padding: 14px 14px max(96px, calc(32px + env(safe-area-inset-bottom)));
+    overflow-x: hidden;
+    font-size: 17px;
+    line-height: 1.65;
+    -webkit-text-size-adjust: 100%;
+    touch-action: pan-y;
+  }
+
+  .rich-source-editor {
+    width: 100%;
+    min-height: calc(100dvh - 50px);
+    box-sizing: border-box;
+    padding: 14px 12px max(96px, calc(32px + env(safe-area-inset-bottom)));
+    font-size: 16px;
+    line-height: 1.55;
+  }
+
+  .append-rich-editor h1 {
+    font-size: 1.65em;
+  }
+
+  .append-rich-editor h2 {
+    font-size: 1.4em;
+  }
+
+  .append-rich-editor h3 {
+    font-size: 1.2em;
+  }
+
+  .append-rich-editor ul,
+  .append-rich-editor ol {
+    padding-left: 1.45em;
+  }
+
+  .append-rich-editor blockquote {
+    padding-left: 0.75em;
+  }
+
+  .append-rich-editor .tableWrapper {
+    width: 100%;
+    max-width: 100%;
+    overflow-x: auto;
+    overflow-y: hidden;
+    -webkit-overflow-scrolling: touch;
+    overscroll-behavior-x: contain;
+  }
+
+  .append-rich-editor table {
+    width: max-content;
+    min-width: 100%;
+    table-layout: auto;
+  }
+
+  .append-rich-editor th,
+  .append-rich-editor td {
+    min-width: 110px;
+    padding: 8px;
+  }
+
+  .append-rich-editor pre {
+    max-width: 100%;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .append-rich-editor img,
+  .append-rich-editor video[data-rich-media],
+  .append-rich-editor audio[data-rich-media] {
+    max-width: 100%;
+  }
+
+  .append-rich-editor div[data-youtube-video] iframe,
+  .append-rich-editor div[data-web-embed] iframe {
+    width: 100%;
+    min-height: 210px;
+    max-height: 55dvh;
+  }
+
+  .find-replace-panel {
+    position: sticky;
+    top: 50px;
+    z-index: 39;
+    width: 100%;
+    box-sizing: border-box;
+    max-height: min(48dvh, 360px);
+    overflow-y: auto;
+    padding: 6px;
+  }
+
+  .find-replace-row {
+    width: 100%;
+    min-width: 0;
+    flex-wrap: wrap;
+  }
+
+  .find-replace-input {
+    min-width: 120px;
+    height: 42px;
+    font-size: 16px;
+  }
+
+  .find-replace-options {
+    gap: 10px;
+    font-size: 13px;
+  }
+
+  .slash-command-menu {
+    position: fixed;
+    left: 8px !important;
+    right: 8px !important;
+    top: auto !important;
+    bottom: max(10px, env(safe-area-inset-bottom));
+    width: auto;
+    max-height: min(46dvh, 360px);
+    box-sizing: border-box;
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .slash-command-item {
+    min-height: 48px;
+    padding: 9px 10px;
+  }
+
+  .selection-menu {
+    display: none !important;
+  }
+
+  .append-block-drag-handle {
+    display: none !important;
+  }
+
+  .rich-editor-status {
+    display: none;
+  }
+
+  .append-rich-editor [data-block-id]::after {
+    display: none;
+  }
+}
+
+@media screen and (max-width: 380px) {
+  .rich-toolbar {
+    gap: 2px;
+    padding-left: 4px;
+    padding-right: 4px;
+  }
+
+  .rich-toolbar-group {
+    gap: 2px;
+    padding-right: 3px;
+  }
+
+  .rich-toolbar-button,
+  .rich-color-control {
+    min-width: 42px;
+    padding-left: 7px;
+    padding-right: 7px;
+    font-size: 14px;
+  }
+
+  .rich-toolbar-select {
+    min-width: 86px;
+    max-width: 126px;
+  }
+
+  .rich-toolbar-select.compact {
+    min-width: 68px;
+    max-width: 82px;
+  }
+
+  .append-rich-editor {
+    padding-left: 10px;
+    padding-right: 10px;
+  }
+}
