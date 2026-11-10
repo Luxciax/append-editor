@@ -41,7 +41,7 @@
 
 The Append Editor is an **unofficial** [editor](https://standardnotes.org/help/77/what-are-editors) for [Standard Notes](https://standardnotes.org), a free, [open-source](https://standardnotes.org/knowledge/5/what-is-free-and-open-source-software), and [end-to-end encrypted](https://standardnotes.org/knowledge/2/what-is-end-to-end-encryption) notes app.
 
-Try the demo at [theodorechu.github.io/append-editor](https://theodorechu.github.io/append-editor) or learn more at [github.com/theodorechu/append-editor](https://github.com/theodorechu/append-editor).
+Try the demo at [append-editor.vxcv.de](https://append-editor.vxcv.de) or learn more at [github.com/theodorechu/append-editor](https://github.com/theodorechu/append-editor).
 
 The Append Editor follows the "read first" philosophy. When you open your notes, the editor starts in Read/View Only Mode so you can't accidentally accidentally edit old notes. You can easily add to the end of your notes with the Append box at the bottom.
 
@@ -92,9 +92,9 @@ This editor works best on the [desktop app](https://standardnotes.org/download) 
 1. Register for an account at Standard Notes using the [Desktop App](https://standardnotes.org/download) or [Web app](https://app.standardnotes.org). Remember to use a strong and memorable password.
 2. In the bottom left corner of the app, click **Extensions**.
 3. Click **Import Extension**.
-4. To install **Append Editor Rich 2.0.0**, paste this into the input box:
+4. To install **Append Editor Rich 2.0.3**, paste this into the input box:
    ```
-   https://raw.githubusercontent.com/Luxciax/append-editor/main/public/beta.ext.json
+   https://append-editor.vxcv.de/beta.ext.json
    ```
 5. Press Enter or Return on your keyboard.
 6. Click **Install**.
