@@ -27,3 +27,5 @@ jobs:
         run: yarn build
 
 # final android viewport validation
+
+# release-candidate validation
