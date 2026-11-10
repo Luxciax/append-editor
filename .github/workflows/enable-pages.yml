@@ -1,0 +1,24 @@
+name: enable-github-pages
+
+permissions:
+  contents: write
+  pages: write
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  enable:
+    if: contains(github.event.head_commit.message, '[enable-pages]')
+    runs-on: ubuntu-latest
+    steps:
+      - name: Enable GitHub Pages from gh-pages
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          cat > pages.json <<'EOF'
+          {"source":{"branch":"gh-pages","path":"/"}}
+          EOF
+          gh api --method POST "repos/${GITHUB_REPOSITORY}/pages"             -H "Accept: application/vnd.github+json"             --input pages.json ||           gh api --method PUT "repos/${GITHUB_REPOSITORY}/pages"             -H "Accept: application/vnd.github+json"             --input pages.json
