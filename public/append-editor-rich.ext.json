@@ -3,11 +3,11 @@
   "name": "Append Editor Rich",
   "content_type": "SN|Component",
   "area": "editor-editor",
-  "version": "2.0.4",
-  "description": "Notesnook-style rich Markdown editing for Standard Notes with live WYSIWYG, Android touch/keyboard layout, slash commands, tables, math, callouts, embeds, block drag handles, and Markdown-first storage.",
+  "version": "2.0.5",
+  "description": "Rich Markdown editor for Standard Notes with Android WebView-safe two-bar mobile layout, virtual-keyboard support, touch-first toolbar, slash commands, tables, math, callouts, embeds, and Markdown-first storage.",
   "url": "https://append-editor.vxcv.de/index.html",
-  "download_url": "https://github.com/Luxciax/append-editor/releases/download/v2.0.4/append-editor-rich-v2.0.4.zip",
-  "latest_url": "https://append-editor.vxcv.de/append-editor-rich-v204.ext.json",
+  "download_url": "https://github.com/Luxciax/append-editor/releases/download/v2.0.5/append-editor-rich-v2.0.5.zip",
+  "latest_url": "https://append-editor.vxcv.de/append-editor-rich-v205.ext.json",
   "marketing_url": "https://github.com/Luxciax/append-editor",
   "thumbnail_url": ""
 }
