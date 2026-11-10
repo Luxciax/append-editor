@@ -1059,3 +1059,47 @@
     top: 102px;
   }
 }
+
+
+/* Android v2.0.5: keep both menu rows in normal document flow.
+   This prevents Chromium/WebView focus scrolling from placing the first
+   editable line underneath a sticky toolbar. */
+@media screen and (max-width: 700px), (pointer: coarse) {
+  .DynamicEditor {
+    min-height: 0;
+  }
+
+  .rich-toolbar {
+    position: relative !important;
+    top: auto !important;
+    left: auto !important;
+    right: auto !important;
+    z-index: 2;
+    height: 50px;
+    min-height: 50px;
+    max-height: 50px;
+    flex: 0 0 50px;
+    overflow-x: auto;
+    overflow-y: hidden;
+  }
+
+  .find-replace-panel {
+    position: relative !important;
+    top: auto !important;
+    z-index: 2;
+  }
+
+  #content.fixed-header .rich-toolbar,
+  #content.fixed-header .find-replace-panel {
+    top: auto !important;
+  }
+
+  .append-rich-editor,
+  .rich-source-editor {
+    scroll-margin-top: 0;
+  }
+
+  .append-rich-editor > :first-child {
+    margin-top: 0.5rem;
+  }
+}
