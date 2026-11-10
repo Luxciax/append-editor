@@ -92,9 +92,9 @@ This editor works best on the [desktop app](https://standardnotes.org/download) 
 1. Register for an account at Standard Notes using the [Desktop App](https://standardnotes.org/download) or [Web app](https://app.standardnotes.org). Remember to use a strong and memorable password.
 2. In the bottom left corner of the app, click **Extensions**.
 3. Click **Import Extension**.
-4. To install **Append Editor Rich 2.0.4**, paste this into the input box:
+4. To install **Append Editor Rich 2.0.5**, paste this into the input box:
    ```
-   https://append-editor.vxcv.de/append-editor-rich-v204.ext.json
+   https://append-editor.vxcv.de/append-editor-rich-v205.ext.json
    ```
 5. Press Enter or Return on your keyboard.
 6. Click **Install**.
