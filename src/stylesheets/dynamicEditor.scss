@@ -1048,3 +1048,14 @@
     padding-right: 10px;
   }
 }
+
+
+@media screen and (max-width: 700px), (pointer: coarse) {
+  #content.fixed-header .rich-toolbar {
+    top: 52px;
+  }
+
+  #content.fixed-header .find-replace-panel {
+    top: 102px;
+  }
+}
