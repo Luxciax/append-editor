@@ -25,3 +25,5 @@ jobs:
         env:
           CI: 'false'
         run: yarn build
+
+# final android viewport validation
