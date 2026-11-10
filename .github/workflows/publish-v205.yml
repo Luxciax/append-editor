@@ -1,0 +1,36 @@
+name: publish-append-editor-rich-v205
+
+permissions:
+  contents: write
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  publish:
+    if: contains(github.event.head_commit.message, '[publish-v205]')
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'yarn'
+      - name: Install dependencies
+        run: yarn install --frozen-lockfile --ignore-engines
+      - name: Production build
+        env:
+          CI: 'false'
+        run: yarn build
+      - name: Package release
+        run: |
+          cd build
+          zip -qr ../append-editor-rich-v2.0.5.zip .
+      - name: Create GitHub Release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh release create v2.0.5 append-editor-rich-v2.0.5.zip             --title "Append Editor Rich v2.0.5"             --notes "Android layout fix: keeps both the top app menu and rich formatting toolbar in normal document flow on touch devices so the first editable line can never be covered; makes both bars single-row horizontal scrollers; removes sticky/fixed overlap calculations on mobile."
